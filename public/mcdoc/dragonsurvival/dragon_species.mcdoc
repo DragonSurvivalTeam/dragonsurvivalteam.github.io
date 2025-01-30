@@ -1,0 +1,106 @@
+use ::java::server::util::TextColor
+
+dispatch minecraft:resource[dragonsurvival:dragon_species] to struct DragonSpecies {
+    /// Starting size will be either this or the min. size of the first stage
+    starting_size?: double @ 1..,
+    /// Can be defined in case the global default list of stages should not be used
+    custom_stage_progression?: (
+        #[id(registry="dragonsurvival:dragon_stages", tags="allowed")] string |
+        [#[id="dragonsurvival:dragon_stages"] string] |
+    ),
+    /// Can be defined in case the global default list of bodies should not be used
+    bodies?: (
+        #[id(registry="dragonsurvival:dragon_bodies", tags="allowed")] string |
+        [#[id="dragonsurvival:dragon_bodies"] string] |
+    ),
+    /// Specifies which abilities this species has
+    abilities?: (
+        #[id(registry="dragonsurvival:dragon_abilities", tags="allowed")] string |
+        [#[id="dragonsurvival:dragon_abilities"] string] |
+    ),
+    /// Specifies which penalties this species has
+    penalties?: (
+        #[id(registry="dragonsurvival:dragon_penalties", tags="allowed")] string |
+        [#[id="dragonsurvival:dragon_penalties"] string] |
+    ),
+    /// Locations to various resources (textures etc.) relevant to the species
+    misc_resources: MiscResources
+}
+
+struct MiscResources {
+    /// The food bar icons - if none are specified the vanilla bar will be rendered
+    food_sprites?: #[id] string,
+    /// The mana sprite icons - if none are specified a generic texture will be used
+    /// (Colored in the primary color of the species)
+    mana_sprites?: ManaSprites,
+    /// Banner which is used in the dragon altar and species screen
+    altar_banner: #[id] string,
+    /// Casting bar
+    ability_bar: #[id] string,
+    /// Left arrow to navigate through the stages if more than 4 are present
+    /// (Generic icons will be used if none are specified)
+    growth_left_arrow?: HoverIcon,
+    /// Right arrow to navigate through the stages if more than 4 are present
+    /// (Generic icons will be used if none are specified)
+    growth_right_arrow?: HoverIcon,
+    /// Growth crystals - Fills depending on the progress within the stage
+    growth_crystal: FillIcon,
+    /// Determines how the tooltips are rendered for diet entries
+    food_tooltip: FoodTooltip,
+    /// Determines:
+    /// - dragon diet tooltip text and border color
+    /// - the generic mana sprite icon color
+    primary_color: (
+        #[color="hex_rgb"] string |
+        #[color="named"] TextColor |
+    ),
+    /// Determines:
+    /// - dragon diet tooltip border color
+    secondary_color: (
+        #[color="hex_rgb"] string |
+        #[color="named"] TextColor |
+    ),
+    /// Determines which claw inventory item (tier) is used to render the claw texture
+    claw_texture_slot: ClawSlot
+}
+
+struct ManaSprites {
+    /// Full mana points
+    full: #[id] string,
+    /// Reserved mana points
+    reserved: #[id] string,
+    /// When regenerating mana it switches between 'recovery' and 'empty'
+    recovery: #[id] string,
+    /// When casting
+    empty: #[id] string
+}
+
+struct HoverIcon {
+    hover_icon: #[id] string,
+    icon: #[id] string
+}
+
+struct FillIcon {
+    empty: #[id] string,
+    full: #[id] string
+}
+
+struct FoodTooltip {
+    /// Determines the available characters (default: dragonsurvival:food_tooltip_icon_font)
+    /// (Fonts can reference images and characters can reference spots within said image)
+    font?: #[id] string,
+    nutrition_icon: string,
+    saturation_icon: string,
+    /// Overrides the species primary color for the diet entries tooltip
+    color?: (
+        #[color="hex_rgb"] string |
+        #[color="named"] TextColor |
+    ),
+}
+
+enum(string) ClawSlot {
+	Sword = "sword",
+	Pickaxe = "pickaxe",
+	Shovel = "shovel",
+	Axe = "axe"
+}

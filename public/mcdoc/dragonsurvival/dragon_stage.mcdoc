@@ -1,0 +1,60 @@
+use ::java::data::enchantment::LevelBasedValue
+use ::java::data::advancement::predicate::EntityPredicate
+use ::java::server::util::attribute::AttributeOperation
+
+dispatch minecraft:resource[dragonsurvival:dragon_stage] to struct DragonStage {
+    /// Determines whether this stage is part of the global list of default stages (default: false)
+    is_default?: boolean,
+    /// Min. and max. size of the stage
+    size_range: Bounds,
+    /// Amount of ticks until max. size is reached (can be specified between 1 second and 1 year) (20 ticks = 1 second)
+    ticks_until_grown: int @ 20..630720000,
+    /// Attribute modifiers which scale based on the dragon size (within bounds)
+    /// (Within bounds means if the stage bounds are between 10 and 15 and the current size is 12, the "level" will be 2)
+    modifiers?: [Modifier],
+    /// Items that can be used to increase (or decrease) the growth of the dragon
+    growth_items?: [GrowthItem],
+    /// A condition that determines when to stop the natural growth of the dragon
+    is_natural_growth_stopped?: EntityPredicate,
+    destruction_data?: DestructionData
+}
+
+struct Bounds {
+    min: double @ 1..,
+    max: double @ 1..
+}
+
+struct Modifier {
+    attribute: #[id="attribute"] string,
+    amount: (
+        LevelBasedValue |
+        PreciseLevelBasedValue |
+    ),
+    operation: AttributeOperation
+}
+
+struct GrowthItem {
+    items: (
+        #[id(registry="item", tags="allowed")] string |
+        [#[id="item"] string] |
+    ),
+    /// How much growth is added per use
+    growth_in_ticks: int,
+    /// Determines how often this item can be used (default: infinite)
+    maximum_usages?: int @ 1..
+}
+
+struct DestructionData {
+    /// Min. size at which entities take crushing damage when the dragon walks over them
+    crushing_size: double,
+    /// Min. size at which applicable blocks are destroyed when the dragon walks over them
+    block_destruction_size: double,
+    /// Determines how the crushing damage scales (size * scalar)
+    crushing_damage_scalar: double
+}
+
+/// Allows calculating values using decimals
+struct PreciseLevelBasedValue {
+    precise_base: float,
+    precise_amount: float
+}

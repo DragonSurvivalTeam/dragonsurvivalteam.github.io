@@ -760,6 +760,34 @@
       "dependency": "sky_aesthetics",
       "minVersion": "1.21.1",
       "wiki": "https://github.com/TathanDev/SkyAesthetics/wiki/Custom-Sky"
+    },
+    {
+      "id": "dragonsurvival:dragon_stage",
+      "url": "dragonsurvival/dragon_stage",
+      "tags": ["partners"],
+      "dependency": "dragonsurvival/dragon_stage",
+      "minVersion": "1.21.1"
+    },
+    {
+      "id": "dragonsurvival:dragon_body",
+      "url": "dragonsurvival/dragon_body",
+      "tags": ["partners"],
+      "dependency": "dragonsurvival/dragon_body",
+      "minVersion": "1.21.1"
+    },
+    {
+      "id": "dragonsurvival:dragon_species",
+      "url": "dragonsurvival/dragon_species",
+      "tags": ["partners"],
+      "dependency": "dragonsurvival/dragon_species",
+      "minVersion": "1.21.1"
+    },
+    {
+      "id": "dragonsurvival:dragon_ability",
+      "url": "dragonsurvival/dragon_ability",
+      "tags": ["partners"],
+      "dependency": "dragonsurvival/dragon_ability",
+      "minVersion": "1.21.1"
     }
   ],
   "legacyGuides": [

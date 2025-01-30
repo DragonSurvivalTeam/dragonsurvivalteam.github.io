@@ -1,0 +1,101 @@
+use ::root::dependency::dragonsurvival::dragon_stage::Modifier
+
+dispatch minecraft:resource[dragonsurvival:dragon_body] to struct DragonBody {
+    /// Determines whether this body is part of the global list of default bodies (default: false)
+    is_default?: boolean,
+    /// Attribute modifiers which are always calculated with a "level" of 1
+    modifiers?: [Modifier],
+    /// Determines whether the wings can be hidden (default: true)
+    can_hide_wings?: boolean,
+    /// The model this body uses (default: dragonsurvival:dragon_model)
+    /// The prefix 'geo/' and suffix '.geo.json' will be appended to the path find the model file
+    model?: #[id] string,
+    /// The animations this body uses
+    /// The prefix 'animations/' and suffix '.json' will be appended to the path find the animation file
+    animation: #[id] string,
+    /// List of bones that will be hidden when the wings are hidden
+    /// (default: 'WingLeft', 'WingRight', 'SmallWingLeft' and 'SmallWingRight')
+    bones_to_hide_for_toggle?: [string],
+    /// Which emotes this body can use
+    emotes: [DragonEmoteSet],
+    /// How the height and width dimensions are calculated (using the current scale of the entity)
+    scaling_proportions: ScalingProportions,
+    /// Determines how much the height changes when crouching
+    crouch_height_ratio: double @ 0..1,
+    /// Determines where to place the rider
+    mounting_offset?: MountingOffsets,
+    /// Determines where to place the backpack (the base position is the bone 'BackpackBone')
+    backpack_offset?: BackpackOffsets,
+    /// Default GUI icon which is used if the current species has no specific icon
+    default_icon?: #[id] string
+}
+
+struct DragonEmoteSet {
+    emotes: [DragonEmote]
+}
+
+struct DragonEmote {
+    animation_key: string,
+    translation_override?: string,
+    /// Animation speed (default: 1)
+    speed?: double,
+    /// Animation duration (default: infinite)
+    duration?: int @ 1..,
+    /// Whether the animation can loop or not (default: false)
+    loops?: boolean,
+    /// (default: false)
+    blend?: boolean,
+    /// (default: false)
+    locks_head?: boolean,
+    /// (default: false)
+    locks_tail?: boolean,
+    /// (default: false)
+    third_person?: boolean,
+    /// (default: false)
+    can_move?: boolean,
+    /// Sound to be played during the emote
+    sound?: Sound,
+}
+
+struct Sound {
+    sound_event: abc,
+    /// Volume of the sound (default: 1)
+    volume?: float @ 0..,
+    /// Pitch of the sound (default: 1)
+    pitch?: float @ 0..,
+    /// Determines how often the sound is played (calculated as emote_ticks % interval == 0)
+    interval: int
+}
+
+struct ScalingProportions {
+    width: double @ 0..,
+    height: double @ 0..,
+    eye_height: double @ 0..,
+    offset: double @ 0..
+}
+
+struct MountingOffsets {
+    /// (default: [0, 0, 0])
+    human_offset: Vec3,
+    /// (default: [0, 0, 0])
+    dragon_offset: Vec3,
+    /// (default: [0, 0, 0])
+    offset_per_scale_above_one: Vec3,
+}
+
+struct BackpackOffsets {
+    /// (default: [0, 0, 0])
+    position_offset: Vec3,
+    /// (default: [0, 0, 0])
+    rotation_offset: Vec3,
+    /// (default: [1, 1, 1])
+    scale: Vec3,
+}
+
+// TODO :: vanilla structure
+
+struct Vec3 {
+    x: float,
+    y: float,
+    z: float
+}

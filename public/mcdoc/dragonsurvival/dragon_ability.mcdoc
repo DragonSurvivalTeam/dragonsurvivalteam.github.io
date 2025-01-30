@@ -1,0 +1,316 @@
+use ::java::data::enchantment::LevelBasedValue
+use ::java::data::loot::LootCondition
+
+dispatch minecraft:resource[dragonsurvival:dragon_ability] to struct DragonAbility {
+    activation: Activation,
+    upgrade: Upgrade,
+    /// Disables the ability if the condition is matched
+    usage_blocked?: LootCondition,
+    actions: Action,
+    /// Determines whether the ability can be disabled in the species screen through CTRL+Click
+    can_be_manually_disabled: boolean,
+    /// Defined as GUI sprite (i.e. it needs to be in 'textures/gui/sprites' directory)
+    /// (The 'textures/gui/sprites' path and file ending '.png' also need to be omitted)
+    icon: #[id] string,
+}
+
+// --- Activation --- //
+
+// TODO :: using fake registries (dispatcher) to identify the types (unsure if correct)
+
+dispatch minecraft:resource[dragonsurvival:activation] to struct Activation {
+	type: #[id] ActivationType,
+	...dragonsurvival:activation[[type]],
+}
+
+enum(string) ActivationType {
+    Passive = "passive",
+    Channeled = "active_channeled",
+    Simple = "active_simple"
+}
+
+dispatch dragonsurvival:activation[passive] to struct PassiveActivation {
+    /// Mana cost while this ability is active
+    continuous_mana_cost?: ManaCost
+}
+
+dispatch dragonsurvival:activation[active_channeled] to struct ChanneledActivation {
+    /// Mana cost (consumed when the cast time is completed)
+    initial_mana_cost?: LevelBasedValue,
+    /// Mana cost while this ability is being casted
+    continuous_mana_cost?: ManaCost,
+    /// Charge-up time to cast the ability
+    cast_time?: LevelBasedValue,
+    /// Cooldown that gets applied once the cast has finished
+    cooldown?: LevelBasedValue,
+    /// Whether the caster can move while casting the ability (default: true)
+    can_move_while_casting?: boolean,
+    sound: Sound,
+    animations: Animations
+}
+
+dispatch dragonsurvival:activation[active_simple] to struct SimpleActivation {
+    /// Mana cost (consumed when the cast time is completed)
+    initial_mana_cost?: LevelBasedValue,
+    /// Charge-up time to cast the ability
+    cast_time?: LevelBasedValue,
+    /// Cooldown that gets applied once the cast has finished
+    cooldown?: LevelBasedValue,
+    /// Whether the caster can move while casting the ability (default: true)
+    can_move_while_casting?: boolean,
+    sound: Sound,
+    animations: Animations
+}
+
+struct ManaCost {
+    type: ManaCostType,
+    amount: LevelBasedValue
+}
+
+enum(string) ManaCostType {
+    Ticking = "ticking",
+    Reserved = "reserved"
+}
+
+struct Sound {
+    start?: #[id="sound_event"] string,
+    charging?: #[id="sound_event"] string,
+    looping?: #[id="sound_event"] string,
+    end?: #[id="sound_event"] string
+}
+
+struct Animations {
+    start_and_charging?: (
+        CompoundAbilityAnimation |
+        SimpleAbilityAnimation |
+    ),
+    looping?: SimpleAbilityAnimation,
+    end?: SimpleAbilityAnimation
+}
+
+struct CompoundAbilityAnimation {
+    starting_animation_key: string,
+    looping_animation_key: string,
+    layer: AnimationLayer,
+    /// (default: 0)
+    transition_length?: int,
+    locks_neck: boolean,
+    locks_tail: boolean
+}
+
+struct SimpleAbilityAnimation {
+    animation_key: string,
+    layer: AnimationLayer,
+    /// (default: 0)
+    transition_length?: int,
+    locks_neck: boolean,
+    locks_tail: boolean
+}
+
+enum(string) AnimationLayer {
+    Base = "BASE",
+    Breath = "BREATH",
+    Bite = "BITE"
+}
+
+// --- Upgrade Types --- //
+
+dispatch minecraft:resource[dragonsurvival:upgrade_type] to struct Upgrade {
+	upgrade_type: #[id] UpgradeType,
+	...dragonsurvival:upgrade_type[[upgrade_type]],
+}
+
+enum(string) UpgradeType {
+    ExperiencePoints = "dragonsurvival:experience_points",
+    ExperienceLevel = "dragonsurvival:experience_levels",
+    DragonSize = "dragonsurvival:dragon_size",
+    Item = "dragonsurvival:item_based",
+    Condition = "dragonsurvival:condition_based"
+}
+
+dispatch dragonsurvival:upgrade_type[dragonsurvival:experience_points] to struct ExperiencePointsUpgrade {
+    maximum_level: int @ 0..255,
+    /// Upgrade cost in experience points
+    experience_cost: LevelBasedValue
+}
+
+dispatch dragonsurvival:upgrade_type[dragonsurvival:experience_levels] to struct ExperienceLevelUpgrade {
+    maximum_level: int @ 0..255,
+    /// Experience level required to unlock the level
+    level_requirement: LevelBasedValue
+}
+
+dispatch dragonsurvival:upgrade_type[dragonsurvival:dragon_size] to struct DragonSizeUpgrade {
+    maximum_level: int @ 0..255,
+    /// Dragon size required to unlock the level
+    size_requirement: LevelBasedValue
+}
+
+dispatch dragonsurvival:upgrade_type[dragonsurvival:item_based] to struct ItemUpgrade {
+    /// Valid items per level (to unlock said level)
+    items_per_level: [(
+        #[id(registry="item", tags="allowed")] string |
+        [#[id="item"] string] |
+    )],
+    /// Items that can be used to downgrade the level
+    downgrade_items: (
+        #[id(registry="item", tags="allowed")] string |
+        [#[id="item"] string] |
+    )
+}
+
+dispatch dragonsurvival:upgrade_type[dragonsurvival:condition_based] to struct ConditionUpgrade {
+    /// Conditions to unlock the next level
+    conditions: [LootCondition],
+    /// If enabled the next upgrade will only unlock if the previous conditions matches as well
+    /// If disabled the highest level whose condition matches determines the level
+    require_previous: boolean
+}
+
+// --- Activation --- //
+
+struct Action {
+    target_selection: Targeting,
+    trigger_rate: LevelBasedValue
+}
+
+dispatch minecraft:resource[dragonsurvival:targeting] to struct Targeting {
+    target_type: #[id] TargetingType,
+    ...dragonsurvival:targeting[[target_type]],
+}
+
+// --- Targeting --- //
+
+enum(string) TargetingType {
+    /// Targets in an x by x area around the caster
+    Area = "dragonsurvival:area",
+    /// Targets in a cone in front of the caster
+    Dragon_Breath = "dragonsurvival:dragon_breath",
+    /// Targets a specific entity or block the caster is looking at
+    Looking_At = "dragonsurvival:looking_at",
+    /// Targets the caster
+    Self = "dragonsurvival:self",
+    /// Targets a cylindrical area around the player
+    Disc = "dragonsurvival:disc"
+}
+
+dispatch dragonsurvival:targeting[dragonsurvival:area] to struct AreaTarget {
+    applied_effects: (
+        BlockTargeting |
+        EntityTargeting |
+    ),
+    radius: LevelBasedValue
+}
+
+dispatch dragonsurvival:targeting[dragonsurvival:dragon_breath] to struct DragonBreathTarget {
+    applied_effects: (
+        BlockTargeting |
+        EntityTargeting |
+    ),
+    /// The default range is based on the scale of the caster
+    range_multiplier: LevelBasedValue
+}
+
+dispatch dragonsurvival:targeting[dragonsurvival:looking_at] to struct LookingAtTarget {
+    applied_effects: (
+        BlockTargeting |
+        EntityTargeting |
+    ),
+    range: LevelBasedValue
+}
+
+dispatch dragonsurvival:targeting[dragonsurvival:self] to struct SelfTarget {
+    applied_effects: (
+        BlockTargeting |
+        EntityTargeting |
+    )
+}
+
+dispatch dragonsurvival:targeting[dragonsurvival:disc] to struct DiscTarget {
+    applied_effects: (
+        BlockTargeting |
+        EntityTargeting |
+    ),
+    radius: LevelBasedValue,
+    height: LevelBasedValue,
+    /// If enabled the start height of the disc will be shifted 1 position lower (default: false)
+    /// (Useful in case the ground the caster is walking on is supposed to be the target)
+    height_starts_below
+}
+
+// --- Ability Entity Effects --- //
+
+struct EntityTargeting {
+    target_conditions?: LootCondition,
+    entity_effect: EntityEffect,
+    targeting_mode: TargetingMode
+}
+
+dispatch minecraft:resource[dragonsurvival:ability_entity_effects] to struct EntityEffect {
+    effect_type: #[id] EntityEffectType,
+    ...dragonsurvival:ability_entity_effects[[effect_type]],
+}
+
+enum(string) EntityEffectType {
+    Damage = "dragonsurvival:damage",
+    Modifier = "dragonsurvival:modifier",
+    Potion = "dragonsurvival:potion",
+    Projectile = "dragonsurvival:projectile",
+    Summon_Entity = "dragonsurvival:summon_entity",
+    Damage_Modification = "dragonsurvival:damage_modification",
+    Breath_Particles = "dragonsurvival:breath_particles",
+    Ignite = "dragonsurvival:ignite",
+    Harvest_Bonus = "dragonsurvival:harvest_bonus",
+    On_Attack = "dragonsurvival:on_attack",
+    Flight = "dragonsurvival:flight",
+    Item_Conversion = "dragonsurvival:item_conversion",
+    Swim = "dragonsurvival:swim",
+    Effect_Modification = "dragonsurvival:effect_modification",
+    Particle = "dragonsurvival:particle",
+    Glow = "dragonsurvival:glow",
+    Oxygen_Bonus = "dragonsurvival:oxygen_bonus",
+    Block_Vision = "dragonsurvival:block_vision",
+    Run_Function = "dragonsurvival:run_function"
+}
+
+enum(string) TargetingMode {
+    /// Can target anything except the cater
+    All = "all",
+    /// Only targets entities that are considered as ally
+    Allies = "allies",
+    /// Same as 'Allies' but also includes the caster
+    Allies_And_Self = "allies_and_self",
+    /// Targets any non-ally
+    Non_Allies = "non_allies",
+    /// Targets neutral entities (non-ally and non-enemy)
+    Neutral = "neutral",
+    /// Targets entities considered as enemy, which may be:
+    /// - Categorized as monster
+    /// - Mobs targeting the caster
+    Enemies = "enemies"
+}
+
+// --- Ability Block Effects --- //
+
+struct BlockTargeting {
+    target_conditions?: LootCondition,
+    block_effect: BlockEffect
+}
+
+dispatch minecraft:resource[dragonsurvival:ability_block_effects] to struct BlockEffect {
+    effect_type: #[id] BlockEffectType,
+    ...dragonsurvival:ability_block_effects[[effect_type]],
+}
+
+enum(string) BlockEffectType {
+    Bonemeal = "dragonsurvival:bonemeal",
+    Conversion = "dragonsurvival:conversion",
+    Summon_Entity = "dragonsurvival:summon_entity",
+    Fire = "dragonsurvival:fire",
+    Area_Cloud = "dragonsurvival:area_cloud",
+    Block_Break = "dragonsurvival:block_break",
+    Particle = "dragonsurvival:particle",
+    Run_Function = "dragonsurvival:run_function"
+}
+
+
