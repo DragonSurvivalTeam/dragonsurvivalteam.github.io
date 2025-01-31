@@ -1,27 +1,27 @@
-use ::java::server::util::TextColor
+use ::java::server::util::text::TextColor
 
 dispatch minecraft:resource[dragonsurvival:dragon_species] to struct DragonSpecies {
-    /// Starting size will be either this or the min. size of the first stage
-    starting_size?: double @ 1..,
+    /// Starting growth will be either this or the min. growth of the first stage
+    starting_growth?: double @ 1..,
     /// Can be defined in case the global default list of stages should not be used
     custom_stage_progression?: (
-        #[id(registry="dragonsurvival:dragon_stages", tags="allowed")] string |
-        [#[id="dragonsurvival:dragon_stages"] string] |
+        #[id(registry="dragonsurvival:dragon_stage", tags="allowed")] string |
+        [#[id="dragonsurvival:dragon_stage"] string] |
     ),
     /// Can be defined in case the global default list of bodies should not be used
     bodies?: (
-        #[id(registry="dragonsurvival:dragon_bodies", tags="allowed")] string |
-        [#[id="dragonsurvival:dragon_bodies"] string] |
+        #[id(registry="dragonsurvival:dragon_body", tags="allowed")] string |
+        [#[id="dragonsurvival:dragon_body"] string] |
     ),
     /// Specifies which abilities this species has
     abilities?: (
-        #[id(registry="dragonsurvival:dragon_abilities", tags="allowed")] string |
-        [#[id="dragonsurvival:dragon_abilities"] string] |
+        #[id(registry="dragonsurvival:dragon_ability", tags="allowed")] string |
+        [#[id="dragonsurvival:dragon_ability"] string] |
     ),
     /// Specifies which penalties this species has
     penalties?: (
-        #[id(registry="dragonsurvival:dragon_penalties", tags="allowed")] string |
-        [#[id="dragonsurvival:dragon_penalties"] string] |
+        #[id(registry="dragonsurvival:dragon_penalty", tags="allowed")] string |
+        [#[id="dragonsurvival:dragon_penalty"] string] |
     ),
     /// Locations to various resources (textures etc.) relevant to the species
     misc_resources: MiscResources

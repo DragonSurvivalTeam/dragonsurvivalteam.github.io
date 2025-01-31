@@ -3,7 +3,10 @@ use ::java::data::enchantment::LevelBasedValue
 use ::java::data::enchantment::SpawnParticlesEntityEffect
 use ::java::data::loot::LootCondition
 use ::java::data::advancement::predicate::ItemPredicate
+use ::java::data::advancement::predicate::BlockPredicate
 use ::java::server::util::particle::Particle
+use ::java::server::util::text::TextColor
+use ::java::server::util::block_state::BlockState
 
 dispatch minecraft:resource[dragonsurvival:dragon_ability] to struct DragonAbility {
     /// Determines how the ability is activated
@@ -139,9 +142,9 @@ dispatch minecraft:resource[dragonsurvival:upgrade_type] to struct Upgrade {
 }
 
 enum(string) UpgradeType {
-    ExperiencePoints = "dragonsurvival:experience_points",
-    ExperienceLevel = "dragonsurvival:experience_levels",
-    DragonSize = "dragonsurvival:dragon_size",
+    Experience_Points = "dragonsurvival:experience_points",
+    Experience_Level = "dragonsurvival:experience_levels",
+    Dragon_Growth = "dragonsurvival:dragon_growth",
     Item = "dragonsurvival:item_based",
     Condition = "dragonsurvival:condition_based"
 }
@@ -158,10 +161,10 @@ dispatch dragonsurvival:upgrade_type[dragonsurvival:experience_levels] to struct
     level_requirement: LevelBasedValue
 }
 
-dispatch dragonsurvival:upgrade_type[dragonsurvival:dragon_size] to struct DragonSizeUpgrade {
+dispatch dragonsurvival:upgrade_type[dragonsurvival:dragon_growth] to struct DragonGrowthUpgrade {
     maximum_level: int @ 0..255,
-    /// Dragon size required to unlock the level
-    size_requirement: LevelBasedValue
+    /// Dragon growth required to unlock the level
+    growth_requirement: LevelBasedValue
 }
 
 dispatch dragonsurvival:upgrade_type[dragonsurvival:item_based] to struct ItemUpgrade {
@@ -194,9 +197,9 @@ struct Action {
     trigger_rate: LevelBasedValue
 }
 
-dispatch minecraft:resource[dragonsurvival:targeting] to struct Targeting {
+dispatch minecraft:resource[dragonsurvival:ability_targeting] to struct Targeting {
     target_type: #[id] TargetingType,
-    ...dragonsurvival:targeting[[target_type]],
+    ...dragonsurvival:ability_targeting[[target_type]],
 }
 
 // --- Targeting --- //
@@ -214,7 +217,7 @@ enum(string) TargetingType {
     Disc = "dragonsurvival:disc"
 }
 
-dispatch dragonsurvival:targeting[dragonsurvival:area] to struct AreaTarget {
+dispatch dragonsurvival:ability_targeting[dragonsurvival:area] to struct AreaTarget {
     applied_effects: (
         BlockTargeting |
         EntityTargeting |
@@ -222,7 +225,7 @@ dispatch dragonsurvival:targeting[dragonsurvival:area] to struct AreaTarget {
     radius: LevelBasedValue
 }
 
-dispatch dragonsurvival:targeting[dragonsurvival:dragon_breath] to struct DragonBreathTarget {
+dispatch dragonsurvival:ability_targeting[dragonsurvival:dragon_breath] to struct DragonBreathTarget {
     applied_effects: (
         BlockTargeting |
         EntityTargeting |
@@ -231,7 +234,7 @@ dispatch dragonsurvival:targeting[dragonsurvival:dragon_breath] to struct Dragon
     range_multiplier: LevelBasedValue
 }
 
-dispatch dragonsurvival:targeting[dragonsurvival:looking_at] to struct LookingAtTarget {
+dispatch dragonsurvival:ability_targeting[dragonsurvival:looking_at] to struct LookingAtTarget {
     applied_effects: (
         BlockTargeting |
         EntityTargeting |
@@ -239,14 +242,14 @@ dispatch dragonsurvival:targeting[dragonsurvival:looking_at] to struct LookingAt
     range: LevelBasedValue
 }
 
-dispatch dragonsurvival:targeting[dragonsurvival:self] to struct SelfTarget {
+dispatch dragonsurvival:ability_targeting[dragonsurvival:self] to struct SelfTarget {
     applied_effects: (
         BlockTargeting |
         EntityTargeting |
     )
 }
 
-dispatch dragonsurvival:targeting[dragonsurvival:disc] to struct DiscTarget {
+dispatch dragonsurvival:ability_targeting[dragonsurvival:disc] to struct DiscTarget {
     applied_effects: (
         BlockTargeting |
         EntityTargeting |
@@ -274,10 +277,10 @@ struct EntityTargeting {
     targeting_mode: TargetingMode
 }
 
-dispatch minecraft:resource[dragonsurvival:ability_entity_effects] to struct EntityEffect {
-    // FIXME :: 'effect_type: #[id="dragonsurvival:ability_entity_effects"] string,' does not suggest any types when clicking the field
+dispatch minecraft:resource[dragonsurvival:ability_entity_effect] to struct EntityEffect {
+    // FIXME :: 'effect_type: #[id="dragonsurvival:ability_entity_effect"] string,' does not suggest any types when clicking the field
     effect_type: #[id] EntityEffectType,
-    ...dragonsurvival:ability_entity_effects[[effect_type]],
+    ...dragonsurvival:ability_entity_effect[[effect_type]],
 }
 
 enum(string) EntityEffectType {
@@ -322,21 +325,21 @@ enum(string) TargetingMode {
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:damage] to struct DamageEffect {
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:damage] to struct DamageEffect {
     type: #[id="damage_type"] string,
     amount: LevelBasedValue
 }
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:modifier] to struct ModifierEffect {
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:modifier] to struct ModifierEffect {
     base: DurationInstanceBase,
     modifiers: [Modifier]
 }
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:potion] to struct PotionEffect {
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:potion] to struct PotionEffect {
     potion: PotionData
 }
 
@@ -358,11 +361,11 @@ struct PotionData {
 // ----- # ----- //
 
 // TODO
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:projectile] to struct ProjectileEffect { }
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:projectile] to struct ProjectileEffect { }
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:summon_entity] to struct SummonEntityEffect {
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:summon_entity] to struct SummonEntityEffect_Entity {
     base: DurationInstanceBase,
     /// The weighted list allows for custom weights
     /// Otherwise each entity will have the same weight (therefor chance)
@@ -394,7 +397,7 @@ struct AttributeScale {
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:damage_modification] to struct DamageModificationEffect {
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:damage_modification] to struct DamageModificationEffect {
     modifications: [DamageModification]
 }
 
@@ -410,9 +413,9 @@ struct DamageModification {
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:breath_particles] to struct BreathParticlesEffect {
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:breath_particles] to struct BreathParticlesEffect {
     spread: float,
-    speed_per_size: float,
+    speed_per_growth: float,
     main_particle: Particle,
     secondary_particle: Particle
 }
@@ -422,13 +425,13 @@ dispatch dragonsurvival:ability_entity_effects[dragonsurvival:breath_particles] 
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:ignite] to struct IgniteEffect {
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:ignite] to struct IgniteEffect {
     ignite_ticks: LevelBasedValue
 }
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:harvest_bonus] to struct HarvestBonusEffect {
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:harvest_bonus] to struct HarvestBonusEffect {
     harvest_bonuses: [HarvestBonus]
 }
 
@@ -471,13 +474,13 @@ enum(string) Tier {
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:on_attack] to struct OnAttackEffect {
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:on_attack] to struct OnAttackEffect {
     potion: PotionData
 }
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:flight] to struct FlightEffect {
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:flight] to struct FlightEffect {
     level_requirement: int @ 0..255,
     /// Custom flight icon (default: dragonsurvival:textures/ability_effect/generic_icons/dragon_wings.png)
     icon?: #[id] string
@@ -485,7 +488,7 @@ dispatch dragonsurvival:ability_entity_effects[dragonsurvival:flight] to struct 
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:spin] to struct SpinEffect {
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:spin] to struct SpinEffect {
     level_requirement: int @ 0..255,
     /// Fluids the spin effect can be used in
     /// (If none are specified it can only be used while in the air)
@@ -497,7 +500,7 @@ dispatch dragonsurvival:ability_entity_effects[dragonsurvival:spin] to struct Sp
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:item_conversion] to struct ItemConversionEffect {
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:item_conversion] to struct ItemConversionEffect {
     item_conversions: [ItemConversionData],
     /// A value between 0 (0%) and 1 (100%)
     probability: LevelBasedValue
@@ -517,7 +520,7 @@ struct ItemTo {
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:swim] to struct SwimEffect {
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:swim] to struct SwimEffect {
     /// The time (in ticks) the entity can breathe when submerged in the fluid
     /// (A value of '-1' means unlimited oxygen)
     max_oxygen: LevelBasedValue,
@@ -527,7 +530,7 @@ dispatch dragonsurvival:ability_entity_effects[dragonsurvival:swim] to struct Sw
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:effect_modification] to struct EffectModificationEffect {
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:effect_modification] to struct EffectModificationEffect {
     modifications: [EffectModification]
 }
 
@@ -553,14 +556,14 @@ enum(string) ModificationType {
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:particle] to struct ParticleEffect {
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:particle] to struct ParticleEffect_Entity {
     particle_data: SpawnParticlesEntityEffect, // We have a custom object but the CODEC looks the same
     particle_count: LevelBasedValue
 }
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:glow] to struct GlowEffect {
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:glow] to struct GlowEffect {
     glows: [Glow]
 }
 
@@ -574,7 +577,7 @@ struct Glow {
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:oxygen_bonus] to struct OxygenBonusEffect {
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:oxygen_bonus] to struct OxygenBonusEffect {
     bonuses: [OxygenBonus]
 }
 
@@ -591,7 +594,7 @@ struct OxygenBonus {
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:block_vision] to struct BlockVisionEffect {
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:block_vision] to struct BlockVisionEffect {
     block_visions: [BlockVision]
 }
 
@@ -622,7 +625,7 @@ enum(string) DisplayType {
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effects[dragonsurvival:run_function] to struct RunFunctionEffect {
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:run_function] to struct RunFunctionEffect_Entity {
     /// The minecraft function
     function: #[id] string
 }
@@ -659,9 +662,9 @@ struct BlockTargeting {
     target_conditions?: LootCondition
 }
 
-dispatch minecraft:resource[dragonsurvival:ability_block_effects] to struct BlockEffect {
+dispatch minecraft:resource[dragonsurvival:ability_block_effect] to struct BlockEffect {
     effect_type: #[id] BlockEffectType,
-    ...dragonsurvival:ability_block_effects[[effect_type]],
+    ...dragonsurvival:ability_block_effect[[effect_type]],
 }
 
 enum(string) BlockEffectType {
@@ -673,4 +676,96 @@ enum(string) BlockEffectType {
     Block_Break = "dragonsurvival:block_break",
     Particle = "dragonsurvival:particle",
     Run_Function = "dragonsurvival:run_function"
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_block_effect[dragonsurvival:bonemeal] to struct BonemealEffect {
+    /// How often the bonemeal is applied
+    attempts: LevelBasedValue,
+    /// This is not per-attempt but rather for the effect application as a whole
+    probability: LevelBasedValue
+
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_block_effect[dragonsurvival:conversion] to struct BlockConversionEffect {
+    conversion_data: [BlockConversionData],
+    probability: LevelBasedValue
+}
+
+struct BlockConversionData {
+    /// Determines which blocks will be converted
+    from_predicate: BlockPredicate,
+    /// A weighted list of blocks to be converted into
+    blocks_to: [BlockTo]
+}
+
+struct BlockTo {
+    state: BlockState,
+    weight: int @ 0..
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_block_effect[dragonsurvival:summon_entity] to struct SummonEntityEffect_Block {
+    base: DurationInstanceBase,
+    /// The weighted list allows for custom weights
+    /// Otherwise each entity will have the same weight (therefor chance)
+    entities: (
+        [WeightedListEntry] |
+        #[id(registry="entity_type", tags="allowed")] string |
+        [#[id="entity_type"] string] |
+    ),
+    /// Max. amount of entities that will be summoned per instance
+    max_summons: LevelBasedValue,
+    attribute_scales?: [AttributeScale],
+    /// If enabled the entity will be owned by the summoner and be considered an ally (default: true)
+    /// (It also means that the attack and movement behaviour can be changed through the related keybind)
+    is_allied?: boolean
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_block_effect[dragonsurvival:fire] to struct FireEffect {
+    ignite_probability: LevelBasedValue
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_block_effect[dragonsurvival:area_cloud] to struct AreaCloudEffect {
+    potion: PotionData,
+    duration: LevelBasedValue,
+    probability: double @ 0..1,
+    particle: Particle
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_block_effect[dragonsurvival:block_break] to struct BlockBreakEffect {
+    valid_blocks: BlockPredicateSpecial,
+    probability: LevelBasedValue,
+    /// (default: false)
+    drop_loot?: boolean
+}
+
+// FIXME :: already defined in ::java::data::worldgen::feature but it would clash with the normal block predicate
+struct BlockPredicateSpecial {
+	type: #[id="block_predicate_type"] string,
+	...minecraft:block_predicate[[type]],
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_block_effect[dragonsurvival:particle] to struct ParticleEffect_Block {
+    particle_data: SpawnParticlesEntityEffect, // We have a custom object but the CODEC looks the same
+    particle_count: LevelBasedValue
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_block_effect[dragonsurvival:run_function] to struct RunFunctionEffect_Block {
+    /// The minecraft function
+    function: #[id] string
 }

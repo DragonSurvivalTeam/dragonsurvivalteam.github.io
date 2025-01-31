@@ -5,12 +5,12 @@ use ::java::server::util::attribute::AttributeOperation
 dispatch minecraft:resource[dragonsurvival:dragon_stage] to struct DragonStage {
     /// Determines whether this stage is part of the global list of default stages (default: false)
     is_default?: boolean,
-    /// Min. and max. size of the stage
-    size_range: Bounds,
-    /// Amount of ticks until max. size is reached (can be specified between 1 second and 1 year) (20 ticks = 1 second)
+    /// Min. and max. growth of the stage
+    growth_range: Bounds,
+    /// Amount of ticks until max. growth is reached (can be specified between 1 second and 1 year) (20 ticks = 1 second)
     ticks_until_grown: int @ 20..630720000,
-    /// Attribute modifiers which scale based on the dragon size (within bounds)
-    /// (Within bounds means if the stage bounds are between 10 and 15 and the current size is 12, the "level" will be 2)
+    /// Attribute modifiers which scale based on the dragon growth (within bounds)
+    /// (Within bounds means if the stage bounds are between 10 and 15 and the current growth is 12, the "level" will be 2)
     modifiers?: [Modifier],
     /// Items that can be used to increase (or decrease) the growth of the dragon
     growth_items?: [GrowthItem],
@@ -45,11 +45,11 @@ struct GrowthItem {
 }
 
 struct DestructionData {
-    /// Min. size at which entities take crushing damage when the dragon walks over them
-    crushing_size: double,
-    /// Min. size at which applicable blocks are destroyed when the dragon walks over them
-    block_destruction_size: double,
-    /// Determines how the crushing damage scales (size * scalar)
+    /// Min. growth at which entities take crushing damage when the dragon walks over them
+    crushing_growth: double,
+    /// Min. growth at which applicable blocks are destroyed when the dragon walks over them
+    block_destruction_growth: double,
+    /// Determines how the crushing damage scales (growth * scalar)
     crushing_damage_scalar: double
 }
 
