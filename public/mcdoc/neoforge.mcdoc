@@ -179,3 +179,5 @@ dispatch minecraft:resource[neoforge:data_map_waxables] to DataMap<#[id(registry
 		waxed: #[id="block"] string,
 	} |
 )>
+
+// TODO :: neoforge:fluid_type

@@ -92,8 +92,6 @@ struct BackpackOffsets {
     scale: Vec3,
 }
 
-// TODO :: vanilla structure
-
 struct Vec3 {
     x: float,
     y: float,
