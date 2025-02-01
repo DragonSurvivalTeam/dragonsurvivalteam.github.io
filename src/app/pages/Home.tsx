@@ -1,13 +1,10 @@
 import { useMemo } from 'preact/hooks'
-import contributors from '../../contributors.json'
-import { Card, ChangelogEntry, Footer, GeneratorCard, Giscus, ToolCard, ToolGroup } from '../components/index.js'
-import { WhatsNewTime } from '../components/whatsnew/WhatsNewTime.jsx'
+import { ChangelogEntry, Footer, GeneratorCard, ToolCard, ToolGroup } from '../components/index.js'
 import { useLocale, useTitle } from '../contexts/index.js'
 import { useAsync } from '../hooks/useAsync.js'
 import { useMediaQuery } from '../hooks/useMediaQuery.js'
-import { fetchChangelogs, fetchVersions, fetchWhatsNew } from '../services/DataFetcher.js'
+import { fetchChangelogs, fetchVersions } from '../services/DataFetcher.js'
 import { Store } from '../Store.js'
-import { shuffle } from '../Utils.js'
 
 const MIN_FAVORITES = 2
 const MAX_FAVORITES = 5
@@ -27,7 +24,6 @@ export function Home({}: Props) {
 				{smallScreen ? /* mobile */ <>
 					<PopularGenerators />
 					<FavoriteGenerators />
-					<WhatsNew />
 					<Changelog />
 					<Versions />
 					<Tools />
@@ -39,13 +35,10 @@ export function Home({}: Props) {
 					</div>
 					{!smallScreen && <div class="card-column">
 						<FavoriteGenerators />
-						<WhatsNew />
 						<Tools />
 					</div>}
 				</>}
 			</div>
-			<Contributors />
-			<Giscus />
 			<Footer />
 		</div>
 	</main>
@@ -140,47 +133,4 @@ function Changelog() {
 	return <ToolGroup title={locale('changelog')} link="/changelog/" titleIcon="git_commit">
 		{latestChanges?.map(change => <ChangelogEntry minimal={!hugeScreen} short={true} change={change} />)}
 	</ToolGroup>
-}
-
-function WhatsNew() {
-	const { locale } = useLocale()
-
-	const { value: items } = useAsync(fetchWhatsNew)
-
-	return <ToolGroup title={locale('whats_new')} link="/whats-new/" titleIcon="megaphone">
-		{items?.slice(0, 3).map(item => <Card link="/whats-new/" overlay={<WhatsNewTime item={item} short={true} />}>{item.title}</Card>)}
-	</ToolGroup>
-}
-
-function Contributors() {
-	const supporters = useMemo(() => {
-		return contributors.filter(c => c.types.includes('support') || c.types.includes('infrastructure'))
-	}, [])
-
-	const otherContributors = useMemo(() => {
-		return shuffle(contributors.filter(c => !supporters.includes(c)))
-	}, [])
-
-	return <div class="contributors">
-		<h3>Supporters</h3>
-		<ContributorsList list={supporters} large />
-		<h3>Contributors</h3>
-		<ContributorsList list={otherContributors} />
-	</div>
-}
-
-interface ContributorsListProps {
-	list: typeof contributors
-	large?: boolean
-}
-function ContributorsList({ list, large }: ContributorsListProps) {
-	const { locale } = useLocale()
-
-	return <div class={`contributors-list ${large ? 'contributors-large' : ''}`}>
-		{list.map((c) =>
-			<a class="tooltipped tip-se" href={c.url} target="_blank" aria-label={`${c.name}\n${c.types.map(t => `• ${locale('contributor.' + t)}`).join('\n')}`}>
-				<img width={large ? 48 : 32} height={large ? 48 : 32} src={c.avatar} alt={c.name} loading="lazy" />
-			</a>
-		)}
-	</div>
 }

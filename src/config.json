@@ -638,22 +638,6 @@
       "wiki": "https://minecraft.wiki/w/Shader#Post-processing_effects"
     },
     {
-      "id": "fabric:fabric_mod_json",
-      "url": "fabric/fabric-mod-json",
-      "noPath": true,
-      "tags": ["partners"],
-      "dependency": "fabric",
-      "wiki": "https://wiki.fabricmc.net/documentation:fabric_mod_json"
-    },
-    {
-      "id": "immersive_weathering:block_growth",
-      "url": "immersive-weathering/block-growth",
-      "path": "block_growths",
-      "tags": ["partners"],
-      "dependency": "immersive_weathering",
-      "minVersion": "1.18.2"
-    },
-    {
       "id": "neoforge:biome_modifier",
       "url": "neoforge/biome-modifier",
       "path": "neoforge/biome_modifier",
@@ -742,24 +726,6 @@
       "dependency": "neoforge",
       "minVersion": "1.20.2",
       "wiki": "https://github.com/neoforged/NeoForge/blob/1.21.x/src/main/java/net/neoforged/neoforge/common/world/StructureModifiers.java"
-    },
-    {
-      "id": "ohthetreesyoullgrow:configured_feature",
-      "url": "ohthetreesyoullgrow/feature",
-      "path": "ohthetreesyoullgrow/configured_feature",
-      "tags": ["partners"],
-      "dependency": "ohthetreesyoullgrow",
-      "minVersion": "1.20",
-      "wiki": "https://github.com/CorgiTaco/Oh-The-Trees-Youll-Grow/wiki/Generating-Your-Tree-With-Data-Packs!"
-    },
-    {
-      "id": "sky_aesthetics:sky",
-      "url": "sky-aesthetics/sky",
-      "path": "sky",
-      "tags": ["partners", "assets"],
-      "dependency": "sky_aesthetics",
-      "minVersion": "1.21.1",
-      "wiki": "https://github.com/TathanDev/SkyAesthetics/wiki/Custom-Sky"
     },
     {
       "id": "dragonsurvival:dragon_stage",
