@@ -756,6 +756,13 @@
       "minVersion": "1.21.1"
     },
     {
+      "id": "dragonsurvival:dragon_penalty",
+      "url": "dragonsurvival/dragon_penalty",
+      "tags": ["partners"],
+      "dependency": "dragonsurvival/dragon_penalty",
+      "minVersion": "1.21.1"
+    },
+    {
       "id": "dragonsurvival:data_map_diet_entries",
       "url": "dragonsurvival/data_map-diet_entries",
       "tags": ["partners"],

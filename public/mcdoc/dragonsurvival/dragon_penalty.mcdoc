@@ -1,0 +1,126 @@
+use ::java::data::loot::LootCondition
+use ::java::data::advancement::predicate::ItemPredicate
+use ::java::server::util::particle::Particle
+use ::root::dependency::dragonsurvival::dragon_ability::PotionData
+use ::root::dependency::dragonsurvival::dragon_ability::DamageModification
+
+dispatch minecraft:resource[dragonsurvival:dragon_penalty] to struct DragonPenalty {
+    /// Icon for this penalty
+    icon: #[id] string,
+    /// Determines when this penalty should apply
+    condition?: LootCondition,
+    effect: PenaltyEffect,
+    trigger: PenaltyTrigger
+}
+
+// ----- Penalty Effects ----- //
+
+dispatch minecraft:resource[dragonsurvival:penalty_effect] to struct PenaltyEffect {
+	penalty_type: #[id] PenaltyType,
+	...dragonsurvival:penalty_effect[[penalty_type]],
+}
+
+enum(string) PenaltyType {
+    Take_Damage = "dragonsurvival:take_damage",
+    Mob_Effect = "dragonsurvival:mob_effect",
+    Item_Blacklist = "dragonsurvival:item_blacklist",
+    Damage_Modification = "dragonsurvival:damage_modification"
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:penalty_effect[dragonsurvival:take_damage] to struct DamagePenalty {
+    damage_type: #[id="damage_type"] string,
+    amount: float
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:penalty_effect[dragonsurvival:mob_effect] to struct MobEffectPenalty {
+    potion: PotionData
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:penalty_effect[dragonsurvival:item_blacklist] to struct ItemBlacklistPenalty {
+    /// A valid resource location (namespace:path)
+    /// Regular expressions are allowed in namespace and path
+	items: string,
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:penalty_effect[dragonsurvival:damage_modification] to struct DamageModificationPenalty {
+    modification: DamageModification,
+    duration: int @ -1..
+}
+
+// ----- Penalty Triggers ----- //
+
+dispatch minecraft:resource[dragonsurvival:penalty_trigger] to struct PenaltyTrigger {
+	penalty_trigger: #[id] PenaltyTriggerType,
+	...dragonsurvival:penalty_trigger[[penalty_trigger]],
+}
+
+enum(string) PenaltyTriggerType {
+    Supply = "dragonsurvival:supply",
+    Instant = "dragonsurvival:instant",
+    Item_Used = "dragonsurvival:item_used",
+    Hit_By_Projectile = "dragonsurvival:hit_by_projectile",
+    Hit_By_Water_Potion = "dragonsurvival:hit_by_water_potion"
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:penalty_trigger[dragonsurvival:supply] to struct SupplyTrigger {
+    /// Unique identifier for this supply type
+    supply_type: #[id] string,
+    /// Attribute that determines the resistance for this supply
+    /// The resistance determines the max. supply value and once said supply has ran out the penalty effect can occur
+    /// (By default 'dragonsurvival:penalty_resistance_time' is used, which has a base of 10 seconds (attribute value of 200))
+    attribute?: #[id="attribute"] string,
+    /// The rate at which the penalty triggers (The check is 'game_time % trigger_rate == 0')
+    trigger_rate: int @ 1..,
+    /// The amount by which the supply decreases once the condition matches
+    reduction_rate: float @ 0..,
+    /// The amount by which the supply increases once the condition no longer matches
+    regeneration_rate: float @ 0..,
+    /// Items or potions that can be used to recover supply
+    /// (Default: none)
+    recovery_items?: [RecoveryItems],
+    /// ?
+    /// (Default: false)
+    display_like_hunger_bar?: boolean,
+    particles_on_trigger?: Particle
+}
+
+struct RecoveryItems {
+    item_predicates: [ItemPredicate],
+    percent_restored: float @ 0..1
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:penalty_trigger[dragonsurvival:instant] to struct InstantTrigger {
+    /// The rate at which the penalty triggers (The check is 'game_time % trigger_rate == 0')
+    trigger_rate: int @ 1..
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:penalty_trigger[dragonsurvival:item_used] to struct ItemUsedTrigger {
+    item_predicates: [ItemPredicate],
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:penalty_trigger[dragonsurvival:hit_by_projectile] to struct HitByProjectileTrigger {
+    projectiles: (
+        #[id(registry="entity_type", tags="allowed")] string |
+        [#[id="entity_type"] string] |
+    ),
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:penalty_trigger[dragonsurvival:hit_by_water_potion] to struct HitByWaterPotionTrigger { }
