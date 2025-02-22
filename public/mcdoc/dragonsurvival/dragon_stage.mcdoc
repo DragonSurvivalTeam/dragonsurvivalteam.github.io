@@ -7,7 +7,7 @@ dispatch minecraft:resource[dragonsurvival:dragon_stage] to struct DragonStage {
     is_default?: boolean,
     /// Min. and max. growth of the stage
     growth_range: Bounds,
-    /// Amount of ticks until max. growth is reached (can be specified between 1 second and 1 year) (20 ticks = 1 second)
+    /// Amount of ticks until max. growth is reached (can be specified between 1 tick and 1 year) (20 ticks = 1 second)
     ticks_until_grown: int @ 20..630720000,
     /// Attribute modifiers which scale based on the dragon growth (within bounds)
     /// (Within bounds means if the stage bounds are between 10 and 15 and the current growth is 12, the "level" will be 2)
@@ -39,6 +39,8 @@ struct GrowthItem {
         [#[id="item"] string] |
     ),
     /// How much growth is added per use
+    /// A value of 0 makes the item switch the 'is_growth_stopped' field instead
+    /// (Said field is used in the default 'is_natural_growth_stopped' condition)
     growth_in_ticks: int,
     /// Determines how often this item can be used (default: infinite)
     maximum_usages?: int @ 1..

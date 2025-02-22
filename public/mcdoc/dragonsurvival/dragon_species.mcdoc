@@ -1,8 +1,15 @@
+use ::java::data::loot::LootCondition
 use ::java::server::util::text::TextColor
 
 dispatch minecraft:resource[dragonsurvival:dragon_species] to struct DragonSpecies {
     /// Starting growth will be either this or the min. growth of the first stage
     starting_growth?: double @ 1..,
+    /// Specifies the unlock condition for this species and its visibility in the dragon altar
+    /// (Every species uses the same entry by default whose values are mentioned in the 'mana_handling' field specifications)
+    unlockable_behaviour?: UnlockableBehaviour,
+    /// Specifies some mana interactions
+    /// Notably how experience (levels) interact with it (e.g. conversion of experience into mana when all mana is spent)
+    mana_handling?: ManaHandling,
     /// Can be defined in case the global default list of stages should not be used
     custom_stage_progression?: (
         #[id(registry="dragonsurvival:dragon_stage", tags="allowed")] string |
@@ -25,6 +32,32 @@ dispatch minecraft:resource[dragonsurvival:dragon_species] to struct DragonSpeci
     ),
     /// Locations to various resources (textures etc.) relevant to the species
     misc_resources: MiscResources
+}
+
+struct UnlockableBehaviour {
+    unlock_condition?: LootCondition,
+    visibility?: Visibility
+}
+
+enum(string) Visibility {
+    Always_Visible = "always_visible",
+    Always_Hidden = "always_hidden",
+    Visible_If_Locked = "visible_if_locked"
+}
+
+struct ManaHandling {
+    /// Specifies how much mana experience is worth (default: 0)
+    /// If the value is 0 then no conversion occurs
+    /// (The default 'mana_handling' entry uses a value of 0.1, meaning 1 mana = 10 experience points)
+    mana_xp_conversion?: double @ 0..,
+    /// Specifies how much mana is gained per experience level (default: 0)
+    /// If the value is 0 then no additional mana is granted
+    /// (The default 'mana_handling' entry uses a value of 0.25, meaning every 4 experience levels = 1 mana)
+    mana_per_level?: double @ 0..,
+    /// Specifies the max. amount of mana that can gained through experience levels (default: 0)
+    /// If the value is 0 then no additional mana is granted
+    /// (The default 'mana_handling' entry uses a value of 9, meaning every it caps out at experience level 36)
+    max_mana_from_levels?: double @ 0..
 }
 
 struct MiscResources {

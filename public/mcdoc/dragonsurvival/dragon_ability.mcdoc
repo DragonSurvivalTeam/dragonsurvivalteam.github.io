@@ -6,11 +6,12 @@ use ::java::data::advancement::predicate::ItemPredicate
 use ::java::data::advancement::predicate::BlockPredicate
 use ::java::server::util::particle::Particle
 use ::java::server::util::text::TextColor
+use ::java::server::util::text::Text
 use ::java::server::util::block_state::BlockState
 
 dispatch minecraft:resource[dragonsurvival:dragon_ability] to struct DragonAbility {
     /// Determines how the ability is activated
-    activation: Activation, // FIXME :: using fake registries (dispatcher) to identify the types (unsure if correct)
+    activation: Activation,
     /// Defines the max. level of the ability and how to upgrade it
     /// (If no upgrade is defined, the max. level will be 1)
     upgrade?: Upgrade,
@@ -21,7 +22,7 @@ dispatch minecraft:resource[dragonsurvival:dragon_ability] to struct DragonAbili
     /// Determines whether the ability can be disabled in the species screen through CTRL+Click
     can_be_manually_disabled: boolean,
     /// Icons for this ability
-    icon: LevelBasedResource,
+    icon: LevelBasedResource
 }
 
 struct LevelBasedResource {
@@ -40,57 +41,76 @@ struct LevelBasedResourceEntry {
 // --- Activation --- //
 
 dispatch minecraft:resource[dragonsurvival:activation] to struct Activation {
-	type: #[id] ActivationType,
-	...dragonsurvival:activation[[type]],
+	activation_type: #[id] ActivationType,
+	...dragonsurvival:activation[[activation_type]],
 }
 
 enum(string) ActivationType {
-    Passive = "passive",
-    Channeled = "active_channeled",
-    Simple = "active_simple"
+    Passive = "dragonsurvival:passive",
+    Simple = "dragonsurvival:simple",
+    Channeled = "dragonsurvival:channeled"
 }
 
-dispatch dragonsurvival:activation[passive] to struct PassiveActivation {
+dispatch dragonsurvival:activation[dragonsurvival:passive] to struct PassiveActivation {
     /// Mana cost while this ability is active
-    continuous_mana_cost?: ManaCost
+    continuous_mana_cost?: ReservedManaCost
 }
 
-dispatch dragonsurvival:activation[active_channeled] to struct ChanneledActivation {
+dispatch dragonsurvival:activation[dragonsurvival:simple] to struct SimpleActivation {
+    /// Mana cost (consumed when the cast time is completed)
+    initial_mana_cost?: LevelBasedValue,
+    /// Charge-up time to cast the ability
+    cast_time?: LevelBasedValue,
+    /// Cooldown that gets applied once the cast has finished
+    cooldown?: LevelBasedValue,
+    /// Specifies which message is displayed when:
+    /// - Not enough mana is available to initiate the cast
+    /// - The ability is blocked ('usage_blocked' condition)
+    /// (By default every ability will have a notification entry which contains a "not enough mana" message)
+    notification?: Notification,
+    /// Whether the caster can move while casting the ability (default: true)
+    can_move_while_casting?: boolean,
+    /// Sound to be played at the various stages of the ability
+    /// (Simple activation does not support looping sounds)
+    sound?: Sound,
+    /// Animations to be played at the various stages of the ability
+    /// (Simple activation does not support looping animations)
+    animations?: Animations
+}
+
+dispatch dragonsurvival:activation[dragonsurvival:channeled] to struct ChanneledActivation {
     /// Mana cost (consumed when the cast time is completed)
     initial_mana_cost?: LevelBasedValue,
     /// Mana cost while this ability is being casted
-    continuous_mana_cost?: ManaCost,
+    continuous_mana_cost?: TickingManaCost,
     /// Charge-up time to cast the ability
     cast_time?: LevelBasedValue,
     /// Cooldown that gets applied once the cast has finished
     cooldown?: LevelBasedValue,
+    /// Specifies which message is displayed when:
+    /// - Not enough mana is available to initiate the cast
+    /// - The ability is blocked ('usage_blocked' condition)
+    /// (By default every ability will have a notification entry which contains a "not enough mana" message)
+    notification?: Notification,
     /// Whether the caster can move while casting the ability (default: true)
     can_move_while_casting?: boolean,
     sound?: Sound,
     animations?: Animations
 }
 
-dispatch dragonsurvival:activation[active_simple] to struct SimpleActivation {
-    /// Mana cost (consumed when the cast time is completed)
-    initial_mana_cost?: LevelBasedValue,
-    /// Charge-up time to cast the ability
-    cast_time?: LevelBasedValue,
-    /// Cooldown that gets applied once the cast has finished
-    cooldown?: LevelBasedValue,
-    /// Whether the caster can move while casting the ability (default: true)
-    can_move_while_casting?: boolean,
-    sound?: Sound,
-    animations?: Animations
-}
-
-struct ManaCost {
-    type: ManaCostType,
+struct ReservedManaCost {
+    type: "reserved",
     amount: LevelBasedValue
 }
 
-enum(string) ManaCostType {
-    Ticking = "ticking",
-    Reserved = "reserved"
+struct TickingManaCost {
+    type: "ticking",
+    amount: LevelBasedValue
+}
+
+struct Notification {
+    not_enough_mana?: Text,
+    usage_blocked?: Text
 }
 
 struct Sound {
@@ -258,7 +278,7 @@ dispatch dragonsurvival:ability_targeting[dragonsurvival:disc] to struct DiscTar
     height: LevelBasedValue,
     /// If enabled the start height of the disc will be shifted 1 position lower (default: false)
     /// (Useful in case the ground the caster is walking on is supposed to be the target)
-    height_starts_below
+    height_starts_below?: boolean
 }
 
 // --- Ability Entity Effects --- //
@@ -303,7 +323,8 @@ enum(string) EntityEffectType {
     Glow = "dragonsurvival:glow",
     Oxygen_Bonus = "dragonsurvival:oxygen_bonus",
     Block_Vision = "dragonsurvival:block_vision",
-    Run_Function = "dragonsurvival:run_function"
+    Run_Function = "dragonsurvival:run_function",
+    Smelting = "dragonsurvival:smelting"
 }
 
 enum(string) TargetingMode {
@@ -320,7 +341,9 @@ enum(string) TargetingMode {
     /// Targets entities considered as enemy, which may be:
     /// - Categorized as monster
     /// - Mobs targeting the caster
-    Enemies = "enemies"
+    Enemies = "enemies",
+    /// Targets items
+    Items = "items"
 }
 
 // ----- # ----- //
@@ -621,6 +644,19 @@ struct BlockVision {
 enum(string) DisplayType {
     Outline = "outline",
     Particles = "particles"
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:smelting] to struct SmeltItemEffect {
+    /// Determines which items are effected
+    item_predicate?: ItemPredicate,
+    /// How much progress is added to the smelting (1 = 100%) per effect application
+    /// The progress of the item resets after 3 seconds if the item is no longer being smelted
+    /// (The item will be smelt instantly if no progress is specified)
+    progress: LevelBasedValue,
+    /// Whether the smelting grants the experience (defined in the recipe) (default: true)
+    grants_experience?: boolean
 }
 
 // ----- # ----- //
