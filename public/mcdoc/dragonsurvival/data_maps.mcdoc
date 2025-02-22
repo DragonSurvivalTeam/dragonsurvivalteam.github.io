@@ -1,0 +1,95 @@
+use ::java::server::world::item::Food
+use ::root::dependency::neoforge::DataMap
+
+type ComplexRemovalDataMap<K, V, R> = struct {
+	replace?: boolean,
+	values: struct DataMapValues {
+		[K]: (
+			V |
+			struct ReplaceableValue {
+				replace?: boolean,
+				value: V,
+			} |
+		)
+	},
+	remove?: struct RemovalEntry {
+	    [K]: [R]
+	}
+}
+
+type SimpleMap<K, V> = struct {
+    [K]: V
+}
+
+// ----- # ----- //
+
+dispatch minecraft:resource[dragonsurvival:data_map_diet_entries] to ComplexRemovalDataMap<#[id(registry="dragonsurvival:dragon_species",tags="allowed")] string, DietEntry, string>
+
+struct DietEntry {
+    /// A valid resource location (namespace:path)
+    /// Regular expressions are allowed in namespace and path
+	items: string,
+	// The existing food properties will be used if not specified
+	properties?: Food
+}
+
+// ----- # ----- //
+
+dispatch minecraft:resource[dragonsurvival:data_map_stage_resources] to ComplexRemovalDataMap<#[id(registry="dragonsurvival:dragon_species",tags="allowed")] string, SimpleMap<#[id="dragonsurvival:dragon_stage"] string, StageResource>, #[id="dragonsurvival:dragon_stage"] string>
+
+struct StageResource {
+    growth_icon: GrowthIcon,
+    default_skin: DefaultSkin
+}
+
+struct GrowthIcon {
+    hover_icon: #[id] string,
+    icon: #[id] string
+}
+
+struct DefaultSkin {
+    skin: #[id] string,
+    glow_skin: #[id] string
+}
+
+// ----- # ----- //
+
+dispatch minecraft:resource[dragonsurvival:data_map_end_platforms] to DataMap<#[id(registry="dragonsurvival:dragon_species",tags="allowed")] string, EndPlatform>
+
+struct EndPlatform {
+    structure: #[id] string,
+    spawn_position: [int] @ 3
+}
+
+// ----- # ----- //
+
+dispatch minecraft:resource[dragonsurvival:data_map_dragon_beacon_data] to DataMap<#[id(registry="dragonsurvival:dragon_species",tags="allowed")] string, DragonBeaconData>
+
+struct DragonBeaconData {
+    effects: [Effect],
+    payment_data: PaymentData
+}
+
+struct PaymentData {
+    /// Experience cost when interacting with an activated beacon
+    /// (Default: 0)
+    experience_cost?: int @ 0..,
+    /// Default: 1
+    duration_multiplier?: int @ 0..,
+    /// Default: 0
+    amplifier_modification:? int @ 0..
+}
+
+struct Effect {
+    effect: #[id="mob_effect"] string,
+    /// Default: Infinite duration
+    duration?: int @ 1..,
+    /// Default: 0
+    amplifier?: int @ 0..
+}
+
+// ----- # ----- //
+
+// FIXME :: not working for some reason - seems unrelated to this definition?
+dispatch minecraft:resource[dragonsurvival:data_map_body_icons] to ComplexRemovalDataMap<#[id(registry="dragonsurvival:dragon_body",tags="allowed")] string, SimpleMap<#[id="dragonsurvival:dragon_species"] string, #[id] string>, #[id="dragonsurvival:dragon_species"] string>
+

@@ -82,24 +82,18 @@ struct ScalingProportions {
 
 struct MountingOffsets {
     /// (default: [0, 0, 0])
-    human_offset: Vec3,
+    human_offset: [float] @ 3,
     /// (default: [0, 0, 0])
-    dragon_offset: Vec3,
+    dragon_offset: [float] @ 3,
     /// (default: [0, 0, 0])
-    offset_per_scale_above_one: Vec3,
+    offset_per_scale_above_one: [float] @ 3,
 }
 
 struct BackpackOffsets {
     /// (default: [0, 0, 0])
-    position_offset: Vec3,
+    position_offset: [float] @ 3,
     /// (default: [0, 0, 0])
-    rotation_offset: Vec3,
+    rotation_offset: [float] @ 3,
     /// (default: [1, 1, 1])
-    scale: Vec3,
-}
-
-struct Vec3 {
-    x: float,
-    y: float,
-    z: float
+    scale: [float] @ 3,
 }

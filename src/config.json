@@ -754,6 +754,41 @@
       "tags": ["partners"],
       "dependency": "dragonsurvival/dragon_ability",
       "minVersion": "1.21.1"
+    },
+    {
+      "id": "dragonsurvival:data_map_diet_entries",
+      "url": "dragonsurvival/data_map-diet_entries",
+      "tags": ["partners"],
+      "dependency": "dragonsurvival/data_maps",
+      "minVersion": "1.21.1"
+    },
+    {
+      "id": "dragonsurvival:data_map_stage_resources",
+      "url": "dragonsurvival/data_map-stage_resources",
+      "tags": ["partners"],
+      "dependency": "dragonsurvival/data_maps",
+      "minVersion": "1.21.1"
+    },
+    {
+      "id": "dragonsurvival:data_map_end_platforms",
+      "url": "dragonsurvival/data_map-end_platforms",
+      "tags": ["partners"],
+      "dependency": "dragonsurvival/data_maps",
+      "minVersion": "1.21.1"
+    },
+    {
+      "id": "dragonsurvival:data_map_dragon_beacon_data",
+      "url": "dragonsurvival/data_map-dragon_beacon_data",
+      "tags": ["partners"],
+      "dependency": "dragonsurvival/data_maps",
+      "minVersion": "1.21.1"
+    },
+    {
+      "id": "dragonsurvival:data_map_body_icons",
+      "url": "dragonsurvival/data_map-body_icons",
+      "tags": ["partners"],
+      "dependency": "dragonsurvival/data_maps",
+      "minVersion": "1.21.1"
     }
   ],
   "legacyGuides": [
