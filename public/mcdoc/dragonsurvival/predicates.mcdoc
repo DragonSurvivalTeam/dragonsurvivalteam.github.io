@@ -1,0 +1,80 @@
+use ::java::data::util::MinMaxBounds
+
+dispatch minecraft:entity_sub_predicate[dragonsurvival:dragon_predicate] to struct DragonPredicate {
+    dragon_species?: (
+    #[id(registry="dragonsurvival:dragon_species", tags="allowed")] string |
+        [#[id="dragonsurvival:dragon_species"] string] |
+    ),
+    stage_specific?: DragonStatePredicate,
+    dragon_body?: (
+        #[id(registry="dragonsurvival:dragon_body", tags="allowed")] string |
+        [#[id="dragonsurvival:dragon_body"] string] |
+    ),
+    /// This flag is switched by growth items with a growth of 0
+    is_growth_stopped?: boolean,
+    /// This flag is set when an ender dragon dies and the player has damaged it beforehand
+    /// It is cleared when interacting with the primordial anchor block in the end dimension
+    /// (For that to work an ender dragon has to be alive and the block needs to be in a charged state)
+    marked_by_ender_dragon?: boolean,
+    /// This flag is switched by the flight grant item
+    /// It can also be set to 'true' by  the primordial anchor if the related config is enabled
+    flight_was_granted?: boolean,
+    /// This flag is switched by the spin grant item
+    /// It can also be set to 'true' by  the primordial anchor if the related config is enabled
+    spin_was_granted?: boolean,
+}
+
+struct DragonStagePredicate {
+    dragon_stage?: (
+    #[id(registry="dragonsurvival:dragon_stage", tags="allowed")] string |
+        [#[id="dragonsurvival:dragon_stage"] string] |
+    ),
+    /// Value needs to be between 0 (0%) and 1 (100%)
+    growth_percentage?: MinMaxBounds<Double>,
+    growth?: MinMaxBounds<Double>
+}
+
+// ----- # ----- //
+
+dispatch minecraft:entity_sub_predicate[dragonsurvival:entity_check_predicate] to struct EntityCheckPredicate {
+    check_for?: Type
+}
+
+enum(string) Type {
+    Living_Entity = "living_entity",
+    Enemy = "enemy",
+    Tamed = "tamed",
+    Item = "item",
+    Experience_Orb = "experience_orb"
+}
+
+// ----- # ----- //
+
+dispatch minecraft:entity_sub_predicate[dragonsurvival:custom_predicates] to struct CustomPredicates {
+    eye_in_fluid?: (
+    #[id(registry="neoforge:fluid_type", tags="allowed")] string |
+        [#[id="neoforge:fluid_type"] string] |
+    ),
+    weather_predicate?: WeatherPredicate,
+    sun_light_level?: MinMaxBounds<Integer>,
+    /// Checks for a specific effect granted by an ability
+    has_ability_effect?: #[id] string,
+    is_nearby_entity?: NearbyEntityPredicate,
+    has_uuid?: #[uuid] (#[canonical] [int] @ 4 | string)
+}
+
+struct WeatherPredicate {
+    is_raining?: boolean,
+    is_thundering?: boolean,
+    is_snowing?: boolean,
+    /// More performant than checking rain and snow separately
+    is_raining_or_snowing?: boolean
+}
+
+struct NearbyEntityPredicate {
+    entity_types: (
+    #[id(registry="entity_type", tags="allowed")] string |
+        [#[id="entity_type"] string] |
+    ),
+    radius: int
+}

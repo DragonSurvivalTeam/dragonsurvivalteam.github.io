@@ -648,22 +648,29 @@ enum(string) DisplayType {
 
 // ----- # ----- //
 
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:run_function] to struct RunFunctionEffect_Entity {
+    /// The minecraft function
+    function: #[id] string
+}
+
+// ----- # ----- //
+
 dispatch dragonsurvival:ability_entity_effect[dragonsurvival:smelting] to struct SmeltItemEffect {
     /// Determines which items are effected
     item_predicate?: ItemPredicate,
     /// How much progress is added to the smelting (1 = 100%) per effect application
     /// The progress of the item resets after 3 seconds if the item is no longer being smelted
     /// (The item will be smelt instantly if no progress is specified)
-    progress: LevelBasedValue,
+    progress?: LevelBasedValue,
     /// Whether the smelting grants the experience (defined in the recipe) (default: true)
     grants_experience?: boolean
 }
 
 // ----- # ----- //
 
-dispatch dragonsurvival:ability_entity_effect[dragonsurvival:run_function] to struct RunFunctionEffect_Entity {
-    /// The minecraft function
-    function: #[id] string
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:heal] to struct HealEffect {
+    /// The percentage (1 = 100%) of the max. health of the targeted entity it will get healed by
+    percentage: LevelBasedValue
 }
 
 // ----- # ----- //
