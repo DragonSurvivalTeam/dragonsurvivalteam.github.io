@@ -1,5 +1,5 @@
 use ::java::server::world::item::Food
-use ::root::dependency::neoforge::DataMap
+// use ::root::dependency::neoforge::DataMap // FIXME :: doesn't work
 
 type ComplexRemovalDataMap<K, V, R> = struct {
 	replace?: boolean,
@@ -15,6 +15,21 @@ type ComplexRemovalDataMap<K, V, R> = struct {
 	remove?: struct RemovalEntry {
 	    [K]: [R]
 	}
+}
+
+// TODO :: copied from 'neoforge'
+type DataMap<K, V> = struct {
+	replace?: boolean,
+	values: struct DataMapValues {
+		[K]: (
+			V |
+			struct ReplaceableValue {
+				replace?: boolean,
+				value: V,
+			} |
+		)
+	},
+	remove?: [K],
 }
 
 type SimpleMap<K, V> = struct {
@@ -77,7 +92,7 @@ struct PaymentData {
     /// Default: 1
     duration_multiplier?: int @ 0..,
     /// Default: 0
-    amplifier_modification:? int @ 0..
+    amplifier_modification?: int
 }
 
 struct Effect {
@@ -90,6 +105,4 @@ struct Effect {
 
 // ----- # ----- //
 
-// FIXME :: not working for some reason - seems unrelated to this definition?
 dispatch minecraft:resource[dragonsurvival:data_map_body_icons] to ComplexRemovalDataMap<#[id(registry="dragonsurvival:dragon_body",tags="allowed")] string, SimpleMap<#[id="dragonsurvival:dragon_species"] string, #[id] string>, #[id="dragonsurvival:dragon_species"] string>
-
