@@ -288,8 +288,6 @@ struct EntityTargeting {
     /// Determines which entities are selected as target - available loot context:
     /// - attacking_entity (caster)
     /// - this_entity (target)
-    /// - tool (mainhand of the target)
-    /// - offhand / head / chest / legs / feet (equipment slots from the target)
     /// - origin (position of the target)
     target_conditions?: LootCondition,
     /// A pre-filter for the entities to select
@@ -697,8 +695,6 @@ struct BlockTargeting {
     block_effect: BlockEffect,
     /// Determines which blocks are selected as target - available loot context:
     /// - this_entity (caster)
-    /// - tool (mainhand of the caster)
-    /// - offhand / head / chest / legs / feet (equipment slots from the caster)
     /// - block_state (of the targeted position)
     /// - origin (the targeted position)
     /// - block_entity (of the targeted position) (Optional)

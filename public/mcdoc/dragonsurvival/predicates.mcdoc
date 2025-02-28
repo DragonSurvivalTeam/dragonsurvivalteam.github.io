@@ -1,11 +1,25 @@
 use ::java::data::util::MinMaxBounds
 
-dispatch minecraft:entity_sub_predicate[dragonsurvival:dragon_predicate] to struct DragonPredicate {
+// FIXME :: use custom registry for now until adding entries to existing registries is supported
+
+dispatch minecraft:resource[dragonsurvival:predicates] to struct DSEntitySubPredicate {
+	type: SubPredicate,
+	...dragonsurvival:sub_predicate[[type]],
+}
+
+enum(string) SubPredicate {
+    Dragon_Predicate = "dragonsurvival:dragon_predicate",
+    Entity_Check_Predicate = "dragonsurvival:entity_check_predicate",
+    Custom_Predicates = "dragonsurvival:custom_predicates"
+}
+
+// dispatch minecraft:entity_sub_predicate[dragonsurvival:dragon_predicate] to struct DragonPredicate {
+dispatch dragonsurvival:sub_predicate[dragonsurvival:dragon_predicate] to struct DragonPredicate {
     dragon_species?: (
     #[id(registry="dragonsurvival:dragon_species", tags="allowed")] string |
         [#[id="dragonsurvival:dragon_species"] string] |
     ),
-    stage_specific?: DragonStatePredicate,
+    stage_specific?: DragonStagePredicate,
     dragon_body?: (
         #[id(registry="dragonsurvival:dragon_body", tags="allowed")] string |
         [#[id="dragonsurvival:dragon_body"] string] |
@@ -30,13 +44,14 @@ struct DragonStagePredicate {
         [#[id="dragonsurvival:dragon_stage"] string] |
     ),
     /// Value needs to be between 0 (0%) and 1 (100%)
-    growth_percentage?: MinMaxBounds<Double>,
-    growth?: MinMaxBounds<Double>
+    growth_percentage?: MinMaxBounds<double>,
+    growth?: MinMaxBounds<double>
 }
 
 // ----- # ----- //
 
-dispatch minecraft:entity_sub_predicate[dragonsurvival:entity_check_predicate] to struct EntityCheckPredicate {
+// dispatch minecraft:entity_sub_predicate[dragonsurvival:entity_check_predicate] to struct EntityCheckPredicate {
+dispatch dragonsurvival:sub_predicate[dragonsurvival:entity_check_predicate] to struct EntityCheckPredicate {
     check_for?: Type
 }
 
@@ -50,15 +65,16 @@ enum(string) Type {
 
 // ----- # ----- //
 
-dispatch minecraft:entity_sub_predicate[dragonsurvival:custom_predicates] to struct CustomPredicates {
+// dispatch minecraft:entity_sub_predicate[dragonsurvival:custom_predicates] to struct CustomPredicates {
+dispatch dragonsurvival:sub_predicate[dragonsurvival:custom_predicates] to struct CustomPredicates {
     eye_in_fluid?: (
     #[id(registry="neoforge:fluid_type", tags="allowed")] string |
         [#[id="neoforge:fluid_type"] string] |
     ),
     weather_predicate?: WeatherPredicate,
-    sun_light_level?: MinMaxBounds<Integer>,
-    /// Checks for a specific effect granted by an ability
-    has_ability_effect?: #[id] string,
+    sun_light_level?: MinMaxBounds<int>,
+    /// Checks for a specific effect with a duration applied by an ability or penalty
+    has_duration_effect?: #[id] string,
     is_nearby_entity?: NearbyEntityPredicate,
     has_uuid?: #[uuid] (#[canonical] [int] @ 4 | string)
 }

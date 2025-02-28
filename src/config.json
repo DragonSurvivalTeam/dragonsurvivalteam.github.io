@@ -796,6 +796,13 @@
       "tags": ["partners"],
       "dependency": "dragonsurvival/data_maps",
       "minVersion": "1.21.1"
+    },
+    {
+      "id": "dragonsurvival:predicates",
+      "url": "dragonsurvival/predicates",
+      "tags": ["partners"],
+      "dependency": "dragonsurvival/predicates",
+      "minVersion": "1.21.1"
     }
   ],
   "legacyGuides": [

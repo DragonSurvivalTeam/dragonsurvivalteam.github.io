@@ -1,6 +1,8 @@
 use ::java::data::loot::LootCondition
 use ::java::data::advancement::predicate::ItemPredicate
+use ::java::data::enchantment::LevelBasedValue
 use ::java::server::util::particle::Particle
+use ::root::dependency::dragonsurvival::dragon_ability::DurationInstanceBase
 use ::root::dependency::dragonsurvival::dragon_ability::PotionData
 use ::root::dependency::dragonsurvival::dragon_ability::DamageModification
 
@@ -24,7 +26,8 @@ enum(string) PenaltyType {
     Take_Damage = "dragonsurvival:take_damage",
     Mob_Effect = "dragonsurvival:mob_effect",
     Item_Blacklist = "dragonsurvival:item_blacklist",
-    Damage_Modification = "dragonsurvival:damage_modification"
+    Damage_Modification = "dragonsurvival:damage_modification",
+    Fear = "dragonsurvival:fear"
 }
 
 // ----- # ----- //
@@ -53,6 +56,28 @@ dispatch dragonsurvival:penalty_effect[dragonsurvival:item_blacklist] to struct 
 dispatch dragonsurvival:penalty_effect[dragonsurvival:damage_modification] to struct DamageModificationPenalty {
     modification: DamageModification,
     duration: int @ -1..
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:penalty_effect[dragonsurvival:fear] to struct FearPenalty {
+    fears: [Fear]
+}
+
+struct Fear {
+    base: DurationInstanceBase,
+    /// Determines which entities are affected - available loot context:
+    /// - this_entity (target)
+    /// - origin (position of the target)
+    entity_condition?: LootCondition,
+    /// Determines how close you can get to the entity before it flees
+    /// The max. allowed distance is 64
+    distance: LevelBasedValue,
+    /// Walking movement speed modifier when the entity is running away (default: 1)
+    walk_speed?: LevelBasedValue,
+    /// Sprint movement speed modifier when the entity is running away (default: 1.3)
+    /// This is used once you get too close to the entity
+    sprint_speed?: LevelBasedValue
 }
 
 // ----- Penalty Triggers ----- //
