@@ -18,7 +18,7 @@ dispatch minecraft:resource[dragonsurvival:dragon_ability] to struct DragonAbili
     /// Disables the ability if the condition is matched
     usage_blocked?: LootCondition,
     /// Defines what the ability actually does
-    actions: Action,
+    actions: [Action],
     /// Determines whether the ability can be disabled in the species screen through CTRL+Click
     can_be_manually_disabled: boolean,
     /// Icons for this ability
