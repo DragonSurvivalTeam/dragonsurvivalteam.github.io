@@ -1,5 +1,5 @@
-use ::root::dependency::dragonsurvival::dragon_stage::Modifier
-use ::root::dependency::dragonsurvival::dragon_species::UnlockableBehaviour
+use super::dragon_stage::Modifier
+use super::dragon_species::UnlockableBehaviour
 
 dispatch minecraft:resource[dragonsurvival:dragon_body] to struct DragonBody {
     /// Determines whether this body is part of the global list of default bodies (default: false)

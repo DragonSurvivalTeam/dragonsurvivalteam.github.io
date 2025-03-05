@@ -2,9 +2,9 @@ use ::java::data::loot::LootCondition
 use ::java::data::advancement::predicate::ItemPredicate
 use ::java::data::enchantment::LevelBasedValue
 use ::java::server::util::particle::Particle
-use ::root::dependency::dragonsurvival::dragon_ability::DurationInstanceBase
-use ::root::dependency::dragonsurvival::dragon_ability::PotionData
-use ::root::dependency::dragonsurvival::dragon_ability::DamageModification
+use super::dragon_ability::DurationInstanceBase
+use super::dragon_ability::PotionData
+use super::dragon_ability::DamageModification
 
 dispatch minecraft:resource[dragonsurvival:dragon_penalty] to struct DragonPenalty {
     /// Icon for this penalty

@@ -1,5 +1,5 @@
 use ::java::server::world::item::Food
-// use ::root::dependency::neoforge::DataMap // FIXME :: doesn't work
+use super::super::neoforge::DataMap
 
 type ComplexRemovalDataMap<K, V, R> = struct {
 	replace?: boolean,
@@ -15,21 +15,6 @@ type ComplexRemovalDataMap<K, V, R> = struct {
 	remove?: struct RemovalEntry {
 	    [K]: [R]
 	}
-}
-
-// TODO :: copied from 'neoforge'
-type DataMap<K, V> = struct {
-	replace?: boolean,
-	values: struct DataMapValues {
-		[K]: (
-			V |
-			struct ReplaceableValue {
-				replace?: boolean,
-				value: V,
-			} |
-		)
-	},
-	remove?: [K],
 }
 
 type SimpleMap<K, V> = struct {

@@ -1,4 +1,4 @@
-use ::root::dependency::dragonsurvival::dragon_stage::Modifier
+use super::dragon_stage::Modifier
 use ::java::data::enchantment::LevelBasedValue
 use ::java::data::enchantment::SpawnParticlesEntityEffect
 use ::java::data::loot::LootCondition
