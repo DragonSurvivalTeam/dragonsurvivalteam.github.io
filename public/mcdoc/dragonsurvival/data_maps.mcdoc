@@ -1,5 +1,23 @@
 use ::java::server::world::item::Food
-use super::super::neoforge::DataMap
+
+// ---------------------------------------------------------------------------------------------------------------------
+// FIXME :: broken for modded mcdoc files
+// use super::super::neoforge::DataMap
+
+type DataMap<K, V> = struct {
+	replace?: boolean,
+	values: struct DataMapValues {
+		[K]: (
+			V |
+			struct ReplaceableValue {
+				replace?: boolean,
+				value: V,
+			} |
+		)
+	},
+	remove?: [K],
+}
+// ---------------------------------------------------------------------------------------------------------------------
 
 type ComplexRemovalDataMap<K, V, R> = struct {
 	replace?: boolean,

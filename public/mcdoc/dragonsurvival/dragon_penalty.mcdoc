@@ -2,9 +2,55 @@ use ::java::data::loot::LootCondition
 use ::java::data::advancement::predicate::ItemPredicate
 use ::java::data::enchantment::LevelBasedValue
 use ::java::server::util::particle::Particle
-use super::dragon_ability::DurationInstanceBase
-use super::dragon_ability::PotionData
-use super::dragon_ability::DamageModification
+
+// ---------------------------------------------------------------------------------------------------------------------
+// FIXME :: broken for modded mcdoc files
+// use super::dragon_ability::DurationInstanceBase
+// use super::dragon_ability::PotionData
+// use super::dragon_ability::DamageModification
+
+struct DurationInstanceBase {
+    /// Unique id for the instance to be created
+    id: #[id] string,
+    duration: LevelBasedValue,
+    /// If enabled the created instances will be removed when (default: false):
+    /// - The ability of the caster is no longer active (applies to all instances)
+    /// - The target conditions for the ability no longer match (only applies to instances of the caster)
+    should_remove_automatically?: boolean,
+    /// Condition which causes the instances to be removed when matched
+    early_removal_condition?: LootCondition,
+    /// If no custom icon is provided the ability / penalty icon will be used instead
+    custom_icon?: #[id] string,
+    /// If enabled the instance won't be shown as effect (default: false)
+    is_hidden?: boolean
+}
+
+struct PotionData {
+    effects: (
+        #[id(registry="mob_effect", tags="allowed")] string |
+        [#[id="mob_effect"] string] |
+    ),
+    amplifier: LevelBasedValue,
+    duration: LevelBasedValue,
+    /// (default: 1 (100%))
+    probability: LevelBasedValue,
+    /// (default: false)
+    effect_particles: boolean,
+    /// (default: true)
+    show_icon: boolean
+}
+
+struct DamageModification {
+    base: DurationInstanceBase,
+    damage_types: (
+        #[id(registry="damage_type", tags="allowed")] string |
+        [#[id="damage_type"] string] |
+    ),
+    /// The value '0' indicates that the target will be immune to this damage
+    multiplier: LevelBasedValue
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 dispatch minecraft:resource[dragonsurvival:dragon_penalty] to struct DragonPenalty {
     /// Icon for this penalty

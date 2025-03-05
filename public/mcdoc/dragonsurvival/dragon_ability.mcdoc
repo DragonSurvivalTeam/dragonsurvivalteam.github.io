@@ -1,4 +1,3 @@
-use super::dragon_stage::Modifier
 use ::java::data::enchantment::LevelBasedValue
 use ::java::data::enchantment::SpawnParticlesEntityEffect
 use ::java::data::loot::LootCondition
@@ -8,6 +7,29 @@ use ::java::server::util::particle::Particle
 use ::java::server::util::text::TextColor
 use ::java::server::util::text::Text
 use ::java::server::util::block_state::BlockState
+
+// FIXME :: remove
+use ::java::server::util::attribute::AttributeOperation
+
+// ---------------------------------------------------------------------------------------------------------------------
+// FIXME :: broken for modded mcdoc files
+// use super::dragon_stage::Modifier
+
+struct Modifier {
+    attribute: #[id="attribute"] string,
+    amount: (
+        LevelBasedValue |
+        PreciseLevelBasedValue |
+    ),
+    operation: AttributeOperation
+}
+
+struct PreciseLevelBasedValue {
+    precise_base: float,
+    precise_amount: float
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 dispatch minecraft:resource[dragonsurvival:dragon_ability] to struct DragonAbility {
     /// Determines how the ability is activated

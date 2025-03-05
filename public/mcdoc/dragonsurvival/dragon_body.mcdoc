@@ -1,5 +1,38 @@
-use super::dragon_stage::Modifier
-use super::dragon_species::UnlockableBehaviour
+// FIXME :: remove
+use ::java::server::util::attribute::AttributeOperation
+use ::java::data::loot::LootCondition
+
+// ---------------------------------------------------------------------------------------------------------------------
+// FIXME :: broken for modded mcdoc files
+// use super::dragon_stage::Modifier
+// use super::dragon_species::UnlockableBehaviour
+
+struct Modifier {
+    attribute: #[id="attribute"] string,
+    amount: (
+        LevelBasedValue |
+        PreciseLevelBasedValue |
+    ),
+    operation: AttributeOperation
+}
+
+struct PreciseLevelBasedValue {
+    precise_base: float,
+    precise_amount: float
+}
+
+struct UnlockableBehaviour {
+    unlock_condition?: LootCondition,
+    visibility?: Visibility
+}
+
+enum(string) Visibility {
+    Always_Visible = "always_visible",
+    Always_Hidden = "always_hidden",
+    Visible_If_Locked = "visible_if_locked"
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 dispatch minecraft:resource[dragonsurvival:dragon_body] to struct DragonBody {
     /// Determines whether this body is part of the global list of default bodies (default: false)
