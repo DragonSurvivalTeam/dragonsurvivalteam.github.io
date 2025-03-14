@@ -583,8 +583,8 @@ struct EffectModification {
         #[id(registry="mob_effect", tags="allowed")] string |
         [#[id="mob_effect"] string] |
     ),
-    duration_modification: Modifier,
-    amplifier_modification: Modifier
+    duration_modification?: Modification,
+    amplifier_modification?: Modification
 }
 
 struct Modification {
