@@ -306,7 +306,7 @@ dispatch dragonsurvival:ability_targeting[dragonsurvival:disc] to struct DiscTar
 // --- Ability Entity Effects --- //
 
 struct EntityTargeting {
-    entity_effect: EntityEffect,
+    entity_effect: [EntityEffect],
     /// Determines which entities are selected as target - available loot context:
     /// - attacking_entity (caster)
     /// - this_entity (target)
@@ -714,7 +714,7 @@ struct DurationInstanceBase {
 // --- Ability Block Effects --- //
 
 struct BlockTargeting {
-    block_effect: BlockEffect,
+    block_effect: [BlockEffect],
     /// Determines which blocks are selected as target - available loot context:
     /// - this_entity (caster)
     /// - block_state (of the targeted position)
