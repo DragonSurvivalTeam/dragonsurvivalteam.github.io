@@ -6,7 +6,7 @@ use ::java::data::advancement::predicate::BlockPredicate
 use ::java::server::util::particle::Particle
 use ::java::server::util::text::TextColor
 use ::java::server::util::text::Text
-use ::java::server::util::block_state::BlockState
+use ::java::util::block_state::BlockState
 
 // FIXME :: remove
 use ::java::server::util::attribute::AttributeOperation
