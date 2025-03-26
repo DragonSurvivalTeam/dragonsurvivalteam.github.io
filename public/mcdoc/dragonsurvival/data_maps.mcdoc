@@ -1,4 +1,4 @@
-use ::java::server::world::item::Food
+use ::java::world::component::item::Food
 
 // ---------------------------------------------------------------------------------------------------------------------
 // FIXME :: broken for modded mcdoc files
