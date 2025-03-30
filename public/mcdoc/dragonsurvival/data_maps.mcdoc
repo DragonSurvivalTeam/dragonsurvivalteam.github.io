@@ -41,7 +41,7 @@ type SimpleMap<K, V> = struct {
 
 // ----- # ----- //
 
-dispatch minecraft:resource[dragonsurvival:data_map_diet_entries] to ComplexRemovalDataMap<#[id(registry="dragonsurvival:dragon_species",tags="allowed")] string, DietEntry, string>
+dispatch minecraft:resource[dragonsurvival:data_map_diet_entries] to ComplexRemovalDataMap<#[id(registry="dragonsurvival:dragon_species",tags="allowed")] string, [DietEntry], string>
 
 struct DietEntry {
     /// A valid resource location (namespace:path)
