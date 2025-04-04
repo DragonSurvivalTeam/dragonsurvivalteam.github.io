@@ -369,7 +369,7 @@ enum(string) TargetingMode {
 // ----- # ----- //
 
 dispatch dragonsurvival:ability_entity_effect[dragonsurvival:damage] to struct DamageEffect {
-    type: #[id="damage_type"] string,
+    damage_type: #[id="damage_type"] string,
     amount: LevelBasedValue
 }
 

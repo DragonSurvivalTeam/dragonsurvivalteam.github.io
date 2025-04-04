@@ -1,6 +1,6 @@
-// FIXME :: remove
 use ::java::server::util::attribute::AttributeOperation
 use ::java::data::loot::LootCondition
+use ::java::data::enchantment::LevelBasedValue
 
 // ---------------------------------------------------------------------------------------------------------------------
 // FIXME :: broken for modded mcdoc files
