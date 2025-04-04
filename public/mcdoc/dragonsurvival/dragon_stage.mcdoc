@@ -1,6 +1,6 @@
 use ::java::data::enchantment::LevelBasedValue
 use ::java::data::advancement::predicate::EntityPredicate
-use ::java::server::util::attribute::AttributeOperation
+use ::java::util::attribute::AttributeOperation
 
 dispatch minecraft:resource[dragonsurvival:dragon_stage] to struct DragonStage {
     /// Determines whether this stage is part of the global list of default stages (default: false)

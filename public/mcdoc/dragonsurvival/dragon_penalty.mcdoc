@@ -1,7 +1,7 @@
 use ::java::data::loot::LootCondition
 use ::java::data::advancement::predicate::ItemPredicate
 use ::java::data::enchantment::LevelBasedValue
-use ::java::server::util::particle::Particle
+use ::java::util::particle::Particle
 
 // ---------------------------------------------------------------------------------------------------------------------
 // FIXME :: broken for modded mcdoc files

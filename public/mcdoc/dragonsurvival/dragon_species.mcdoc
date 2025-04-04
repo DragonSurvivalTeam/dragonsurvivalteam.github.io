@@ -1,5 +1,5 @@
 use ::java::data::loot::LootCondition
-use ::java::server::util::text::TextColor
+use ::java::util::text::TextColor
 
 dispatch minecraft:resource[dragonsurvival:dragon_species] to struct DragonSpecies {
     /// Starting growth will be either this or the min. growth of the first stage

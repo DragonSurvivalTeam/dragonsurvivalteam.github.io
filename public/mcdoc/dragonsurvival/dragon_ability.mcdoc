@@ -3,13 +3,13 @@ use ::java::data::enchantment::SpawnParticlesEntityEffect
 use ::java::data::loot::LootCondition
 use ::java::data::advancement::predicate::ItemPredicate
 use ::java::data::advancement::predicate::BlockPredicate
-use ::java::server::util::particle::Particle
-use ::java::server::util::text::TextColor
-use ::java::server::util::text::Text
+use ::java::util::particle::Particle
+use ::java::util::text::TextColor
+use ::java::util::text::Text
 use ::java::util::block_state::BlockState
 
 // FIXME :: remove
-use ::java::server::util::attribute::AttributeOperation
+use ::java::util::attribute::AttributeOperation
 
 // ---------------------------------------------------------------------------------------------------------------------
 // FIXME :: broken for modded mcdoc files

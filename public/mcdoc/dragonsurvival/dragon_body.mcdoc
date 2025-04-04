@@ -1,4 +1,4 @@
-use ::java::server::util::attribute::AttributeOperation
+use ::java::util::attribute::AttributeOperation
 use ::java::data::loot::LootCondition
 use ::java::data::enchantment::LevelBasedValue
 
@@ -21,7 +21,7 @@ struct PreciseLevelBasedValue {
     precise_amount: float
 }
 
-struct UnlockableBehaviour {
+struct UnlockableBehaviour {a
     unlock_condition?: LootCondition,
     visibility?: Visibility
 }
