@@ -21,7 +21,7 @@ struct PreciseLevelBasedValue {
     precise_amount: float
 }
 
-struct UnlockableBehaviour {a
+struct UnlockableBehaviour {
     unlock_condition?: LootCondition,
     visibility?: Visibility
 }
