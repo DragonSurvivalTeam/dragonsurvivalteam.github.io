@@ -6,7 +6,7 @@ dispatch minecraft:resource[dragonsurvival:dragon_species] to struct DragonSpeci
     starting_growth?: double @ 1..,
     /// Specifies the unlock condition for this species and its visibility in the dragon altar
     /// (Every species uses the same entry by default whose values are mentioned in the 'mana_handling' field specifications)
-    unlockable_behaviour?: UnlockableBehaviour,
+    unlockable_behavior?: UnlockableBehavior,
     /// Specifies some mana interactions
     /// Notably how experience (levels) interact with it (e.g. conversion of experience into mana when all mana is spent)
     mana_handling?: ManaHandling,
@@ -34,7 +34,7 @@ dispatch minecraft:resource[dragonsurvival:dragon_species] to struct DragonSpeci
     misc_resources: MiscResources
 }
 
-struct UnlockableBehaviour {
+struct UnlockableBehavior {
     unlock_condition?: LootCondition,
     visibility?: Visibility
 }

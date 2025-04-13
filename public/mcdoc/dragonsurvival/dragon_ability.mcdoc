@@ -421,7 +421,7 @@ dispatch dragonsurvival:ability_entity_effect[dragonsurvival:summon_entity] to s
     max_summons: LevelBasedValue,
     attribute_scales?: [AttributeScale],
     /// If enabled the entity will be owned by the summoner and be considered an ally (default: true)
-    /// (It also means that the attack and movement behaviour can be changed through the related keybind)
+    /// (It also means that the attack and movement behavior can be changed through the related keybind)
     is_allied?: boolean
 }
 
@@ -783,7 +783,7 @@ dispatch dragonsurvival:ability_block_effect[dragonsurvival:summon_entity] to st
     max_summons: LevelBasedValue,
     attribute_scales?: [AttributeScale],
     /// If enabled the entity will be owned by the summoner and be considered an ally (default: true)
-    /// (It also means that the attack and movement behaviour can be changed through the related keybind)
+    /// (It also means that the attack and movement behavior can be changed through the related keybind)
     is_allied?: boolean
 }
 
