@@ -439,6 +439,10 @@ dispatch dragonsurvival:ability_entity_effect[dragonsurvival:damage] to struct D
 // ----- # ----- //
 
 dispatch dragonsurvival:ability_entity_effect[dragonsurvival:modifier] to struct ModifierEffect {
+    modifiers: [ModifierWithDuration]
+}
+
+struct ModifierWithDuration {
     base: DurationInstanceBase,
     modifiers: [Modifier]
 }
