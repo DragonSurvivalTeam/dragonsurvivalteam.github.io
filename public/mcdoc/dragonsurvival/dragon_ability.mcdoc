@@ -73,10 +73,69 @@ enum(string) ActivationType {
     Channeled = "dragonsurvival:channeled"
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 dispatch dragonsurvival:activation[dragonsurvival:passive] to struct PassiveActivation {
     /// Mana cost while this ability is active
-    continuous_mana_cost?: ReservedManaCost
+    continuous_mana_cost?: ReservedManaCost,
+    /// Cooldown that gets applied once the cast has finished
+    cooldown?: LevelBasedValue,
+    /// When the ability triggers
+    /// (Default: dragonsurvival:constant)
+    trigger?: ActivationTrigger
 }
+
+dispatch minecraft:resource[dragonsurvival:activation_trigger] to struct ActivationTrigger {
+    trigger_type: #[id] ActivationTriggers,
+    ...dragonsurvival:activation_trigger[[trigger_type]]
+}
+
+enum(string) ActivationTriggers {
+    Constant = "dragonsurvival:constant",
+    On_Self_Hit = "dragonsurvival:on_self_hit",
+    On_Target_Hit = "dragonsurvival:on_target_hit",
+    On_Target_Killed = "dragonsurvival:on_target_killed",
+    On_Death = "dragonsurvival:on_death"
+}
+
+dispatch dragonsurvival:activation_trigger[dragonsurvival:constant] to struct ConstantTrigger { }
+
+dispatch dragonsurvival:activation_trigger[dragonsurvival:on_self_hit] to struct OnSelfHit {
+    /// Can be used to do damage context related checks (usually not available)
+    /// Available parameters:
+    /// - this_entity (holder of the ability)
+    /// - origin
+    /// - damage_source
+    /// - attacking_entity (Optional)
+    /// - direct_attacking_entity (Optional)
+    condition?: LootCondition
+}
+
+dispatch dragonsurvival:activation_trigger[dragonsurvival:on_target_hit] to struct OnTargetHit {
+    /// Can be used to do damage context related checks (usually not available)
+    /// Available parameters:
+    /// - this_entity (target being hit)
+    /// - origin
+    /// - damage_source
+    /// - attacking_entity (Optional)
+    /// - direct_attacking_entity (Optional)
+    condition?: LootCondition
+}
+
+dispatch dragonsurvival:activation_trigger[dragonsurvival:on_target_killed] to struct OnTargetKilled {
+    /// Can be used to do damage context related checks (usually not available)
+    /// Available parameters:
+    /// - this_entity (target that died)
+    /// - origin
+    /// - damage_source
+    /// - attacking_entity (Optional)
+    /// - direct_attacking_entity (Optional)
+    condition?: LootCondition
+}
+
+dispatch dragonsurvival:activation_trigger[dragonsurvival:on_death] to struct OnDeath { }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 dispatch dragonsurvival:activation[dragonsurvival:simple] to struct SimpleActivation {
     /// Mana cost (consumed when the cast time is completed)
@@ -100,6 +159,8 @@ dispatch dragonsurvival:activation[dragonsurvival:simple] to struct SimpleActiva
     animations?: Animations
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 dispatch dragonsurvival:activation[dragonsurvival:channeled] to struct ChanneledActivation {
     /// Mana cost (consumed when the cast time is completed)
     initial_mana_cost?: LevelBasedValue,
@@ -119,6 +180,8 @@ dispatch dragonsurvival:activation[dragonsurvival:channeled] to struct Channeled
     sound?: Sound,
     animations?: Animations
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 struct ReservedManaCost {
     type: "reserved",
