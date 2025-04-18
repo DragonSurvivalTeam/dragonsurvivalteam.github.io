@@ -765,7 +765,8 @@ dispatch dragonsurvival:ability_entity_effect[dragonsurvival:heal] to struct Hea
 struct DurationInstanceBase {
     /// Unique id for the instance to be created
     id: #[id] string,
-    duration: LevelBasedValue,
+    /// (default: Infinite)
+    duration?: LevelBasedValue,
     /// If enabled the created instances will be removed when (default: false):
     /// - The ability of the caster is no longer active (applies to all instances)
     /// - The target conditions for the ability no longer match (only applies to instances of the caster)
