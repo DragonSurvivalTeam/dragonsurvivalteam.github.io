@@ -101,7 +101,7 @@ enum(string) ActivationTriggers {
 dispatch dragonsurvival:activation_trigger[dragonsurvival:constant] to struct ConstantTrigger { }
 
 dispatch dragonsurvival:activation_trigger[dragonsurvival:on_self_hit] to struct OnSelfHit {
-    /// Can be used to do damage context related checks (usually not available)
+    /// Can be used to do damage context related checks
     /// Available parameters:
     /// - this_entity (holder of the ability)
     /// - origin
@@ -112,7 +112,7 @@ dispatch dragonsurvival:activation_trigger[dragonsurvival:on_self_hit] to struct
 }
 
 dispatch dragonsurvival:activation_trigger[dragonsurvival:on_target_hit] to struct OnTargetHit {
-    /// Can be used to do damage context related checks (usually not available)
+    /// Can be used to do damage context related checks
     /// Available parameters:
     /// - this_entity (target being hit)
     /// - origin
@@ -123,7 +123,7 @@ dispatch dragonsurvival:activation_trigger[dragonsurvival:on_target_hit] to stru
 }
 
 dispatch dragonsurvival:activation_trigger[dragonsurvival:on_target_killed] to struct OnTargetKilled {
-    /// Can be used to do damage context related checks (usually not available)
+    /// Can be used to do damage context related checks
     /// Available parameters:
     /// - this_entity (target that died)
     /// - origin
