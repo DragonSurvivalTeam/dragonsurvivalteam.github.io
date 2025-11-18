@@ -1,4 +1,5 @@
 use ::java::data::util::MinMaxBounds
+use ::java::data::worldgen::feature::block_predicate::BlockPredicate
 
 // FIXME :: use custom registry for now until adding entries to existing registries is supported
 
@@ -36,11 +37,13 @@ dispatch dragonsurvival:sub_predicate[dragonsurvival:dragon_predicate] to struct
     /// This flag is switched by the spin grant item
     /// It can also be set to 'true' by  the primordial anchor if the related config is enabled
     spin_was_granted?: boolean,
+    /// Whether the dragon is flying or not
+    is_flying?: boolean
 }
 
 struct DragonStagePredicate {
     dragon_stage?: (
-    #[id(registry="dragonsurvival:dragon_stage", tags="allowed")] string |
+        #[id(registry="dragonsurvival:dragon_stage", tags="allowed")] string |
         [#[id="dragonsurvival:dragon_stage"] string] |
     ),
     /// Value needs to be between 0 (0%) and 1 (100%)
@@ -52,6 +55,13 @@ struct DragonStagePredicate {
 
 // dispatch minecraft:entity_sub_predicate[dragonsurvival:entity_check_predicate] to struct EntityCheckPredicate {
 dispatch dragonsurvival:sub_predicate[dragonsurvival:entity_check_predicate] to struct EntityCheckPredicate {
+    /// Allows checking for specific types of entities (outside of tags and ids)
+    /// - 'Living Entity' refers to entities that extend this class
+    /// - 'Enemy' refers to entities that implement this interface or are of the mob category 'Monster'
+    /// - 'Tamed' refers to entities that implement this interface and are tamed
+    /// - 'Animal' refers to entities that extend this class
+    /// - 'Item' refers to entities that extend this class
+    /// - 'Experience Orb' refers entities that extend this class
     check_for?: Type
 }
 
@@ -59,6 +69,7 @@ enum(string) Type {
     Living_Entity = "living_entity",
     Enemy = "enemy",
     Tamed = "tamed",
+    Animal = "animal",
     Item = "item",
     Experience_Orb = "experience_orb"
 }
@@ -67,16 +78,30 @@ enum(string) Type {
 
 // dispatch minecraft:entity_sub_predicate[dragonsurvival:custom_predicates] to struct CustomPredicates {
 dispatch dragonsurvival:sub_predicate[dragonsurvival:custom_predicates] to struct CustomPredicates {
+    /// Checks the current fluid that the player is submerged in
+    /// (This refers to the NeoForge Fluid Type)
     eye_in_fluid?: (
     #[id(registry="neoforge:fluid_type", tags="allowed")] string |
         [#[id="neoforge:fluid_type"] string] |
     ),
+    /// Checks the current weather conditions
     weather_predicate?: WeatherPredicate,
+    /// Checks the current light level of the sun
     sun_light_level?: MinMaxBounds<int>,
     /// Checks for a specific effect with a duration applied by an ability or penalty
     has_duration_effect?: #[id] string,
+    /// Allows to check for nearby entities
     is_nearby_entity?: NearbyEntityPredicate,
-    has_uuid?: #[uuid] (#[canonical] [int] @ 4 | string)
+    /// Checks the current food level of a player
+    /// (Max. food level is usually hardcoded to 20)
+    player_hunger?: MinMaxBounds<int>,
+    /// Checks the current health percentage
+    /// (0 = 0% and 1 = 100%)
+    health_percentage?: MinMaxBounds<double>,
+    /// Checks if the entity has a specific UUID
+    has_uuid?: #[uuid] (#[canonical] [int] @ 4 | string),
+    /// Allows to check the block the entity is looking at
+    looking_at_block?: LookingAtBlock
 }
 
 struct WeatherPredicate {
@@ -93,4 +118,11 @@ struct NearbyEntityPredicate {
         [#[id="entity_type"] string] |
     ),
     radius: int
+}
+
+struct LookingAtBlock {
+    /// The block to check for
+    block_predicate: BlockPredicate,
+    /// The distance of the check
+    distance: double
 }
