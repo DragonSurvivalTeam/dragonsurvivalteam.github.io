@@ -46,9 +46,14 @@ dispatch minecraft:resource[dragonsurvival:dragon_body] to struct DragonBody {
     /// The model this body uses (default: dragonsurvival:dragon_model)
     /// The prefix 'geo/' and suffix '.geo.json' will be appended to the path find the model file
     model?: #[id] string,
+    /// Determines the size for the skin texture / armor mask
+    /// (Default is 512 x 512)
+    texture_size?: TextureSize,
     /// The animations this body uses
     /// The prefix 'animations/' and suffix '.json' will be appended to the path find the animation file
     animation: #[id] string,
+    /// Default GUI icon which is used if the current species has no specific icon
+    default_icon?: #[id] string,
     /// List of bones that will be hidden when the wings are hidden
     /// (default: 'WingLeft', 'WingRight', 'SmallWingLeft' and 'SmallWingRight')
     bones_to_hide_for_toggle?: [string],
@@ -62,8 +67,9 @@ dispatch minecraft:resource[dragonsurvival:dragon_body] to struct DragonBody {
     mounting_offset?: MountingOffsets,
     /// Determines where to place the backpack (the base position is the bone 'BackpackBone')
     backpack_offset?: BackpackOffsets,
-    /// Default GUI icon which is used if the current species has no specific icon
-    default_icon?: #[id] string
+    /// To offset the height to display Better Combat weapons correctly
+    /// (Default is 0)
+    bettercombat_weapon_offset?: double
 }
 
 struct DragonEmoteSet {
@@ -129,4 +135,9 @@ struct BackpackOffsets {
     rotation_offset: [float] @ 3,
     /// (default: [1, 1, 1])
     scale: [float] @ 3,
+}
+
+struct TextureSize {
+    width: int,
+    height: int
 }
