@@ -22,9 +22,9 @@ interface PartData extends StyleData {
 interface Props {
 	component: unknown,
 	base?: StyleData,
-	shadow?: boolean,
+	oneline?: boolean,
 }
-export function TextComponent({ component, base = { color: 'white' }, shadow = true }: Props) {
+export function TextComponent({ component, base = { color: 'white' }, oneline }: Props) {
 	const { version } = useVersion()
 	const { lang } = useLocale()
 
@@ -38,12 +38,7 @@ export function TextComponent({ component, base = { color: 'white' }, shadow = t
 	const { value: language } = useAsync(() => getLanguage(version, lang), [version, lang])
 
 	return <div class="text-component">
-		{shadow && <div>
-			{parts.map(p => <TextPart part={p} shadow={true} lang={language ?? {}} />)}
-		</div>}
-		<div class="text-foreground">
-			{parts.map(p => <TextPart part={p} lang={language ?? {}} />)}
-		</div>
+		{parts.map(p => <TextPart part={p} lang={language ?? {}} oneline={oneline} />)}
 	</div>
 }
 
@@ -78,18 +73,18 @@ function visitComponent(component: unknown, consumer: (c: PartData) => void) {
 	}
 }
 
-function inherit(component: object, base: PartData) {
+function inherit(component: any, base: PartData) {
 	return {
-		color: base.color,
-		bold: base.bold,
-		italic: base.italic,
-		underlined: base.underlined,
-		strikethrough: base.strikethrough,
 		...component,
+		color: component.color ?? base.color,
+		bold: component.bold ?? base.bold,
+		italic: component.italic ?? base.italic,
+		underlined: component.underlined ?? base.underlined,
+		strikethrough: component.strikethrough ?? base.strikethrough,
 	}
 }
 
-const TextColors = {
+const TextColors: Record<string, [string, string]> = {
 	black: ['#000', '#000'],
 	dark_blue: ['#00A', '#00002A'],
 	dark_green: ['#0A0', '#002A00'],
@@ -108,19 +103,16 @@ const TextColors = {
 	white: ['#FFF', '#3F3F3F'],
 }
 
-type TextColorKey = keyof typeof TextColors
-const TextColorKeys = Object.keys(TextColors)
-
-function TextPart({ part, shadow, lang }: { part: PartData, shadow?: boolean, lang: Record<string, string> }) {
-	if (part.translate) {
-		const str = resolveTranslate(part.translate, part.fallback, part.with, lang)
-		return <span style={createStyle(part, shadow)}>{str}</span>
-	}
-	return <span style={createStyle(part, shadow)}>{part.text}</span>
+function TextPart({ part, lang, oneline }: { part: PartData, lang: Record<string, string>, oneline?: boolean }) {
+	let text = part.translate
+		? resolveTranslate(part.translate, part.fallback, part.with, lang)
+		: (part.text ?? '')
+	text = oneline ? text.replaceAll('\n', '␊') : text
+	return <span style={createStyle(part)}>{text}</span>
 }
 
 function resolveTranslate(translate: string, fallback: string | undefined, with_: any[] | undefined, lang: Record<string, string>): string {
-	const str = lang[translate] ?? fallback
+	const str = lang[translate] ?? fallback ?? translate
 	if (typeof str !== 'string') return translate
 	const params = with_?.map((c): string => {
 		if (typeof c === 'string' || typeof c === 'number') return `${c}`
@@ -131,11 +123,10 @@ function resolveTranslate(translate: string, fallback: string | undefined, with_
 	return replaceTranslation(str, params)
 }
 
-function createStyle(style: StyleData, shadow?: boolean) {
+function createStyle(style: StyleData) {
 	return {
-		color: style.color && (TextColorKeys.includes(style.color)
-			? TextColors[style.color as TextColorKey][shadow ? 1 : 0]
-			: shadow ? 'transparent' : style.color),
+		color: style.color ? (TextColors[style.color]?.[0] ?? style.color) : undefined,
+		'--shadow-color': style.color ? TextColors[style.color]?.[1] : undefined,
 		fontWeight: (style.bold === true) ? 'bold' : undefined,
 		fontStyle: (style.italic === true) ? 'italic' : undefined,
 		textDecoration: (style.underlined === true)

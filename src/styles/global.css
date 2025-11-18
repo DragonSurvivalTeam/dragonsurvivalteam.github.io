@@ -184,7 +184,7 @@ nav li {
 	display: flex;
 	align-items: center;
 	cursor: pointer;
-	margin: 0 16px;
+	margin: 0 12px;
 	fill: var(--nav);
 	user-select: none;
 	-webkit-user-select: none;
@@ -242,7 +242,8 @@ nav li .btn svg {
 .fancy-menu-results > * svg {
 	width: 16px;
 	height: 16px;
-	fill: var(--nav);
+	color: var(--nav);
+	fill: currentColor;
 	margin-left: 8px;
 	margin-right: 6px;
 	transition: margin 0.2s;
@@ -340,7 +341,7 @@ main > .controls {
 	margin-left: auto;
 	position: sticky;
 	top: 68px;
-	z-index: 1;
+	z-index: 4;
 }
 
 .sounds-controls > *:not(:last-child),
@@ -1116,6 +1117,8 @@ main.has-project {
 	right: 0;
 	margin-top: 8px;
 	z-index: 10;
+	max-height: 300px;
+	overflow-y: auto;
 }
 
 .btn-group {
@@ -1860,18 +1863,167 @@ hr {
 	font-size: 20px;
 	position: relative;
   white-space: pre;
-	line-height: 1.1	;
+	line-height: 1.1;
 }
 
-.text-component > .text-foreground {
-	position: absolute;
-	z-index: 1;
-	left: -2px;
-	top: -2px;
+.text-component span {
+	text-shadow: 2px 2px var(--shadow-color, transparent);
 }
 
 .text-component span:empty:before {
 	content: '\200b';
+}
+
+.dialog-preview {
+	cursor: default;
+}
+
+.dialog-preview * {
+	flex-shrink: 0;
+}
+
+.dialog-preview .text-component {
+	font-size: calc(var(--dialog-px) * 10);
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.dialog-body {
+	text-align: center;
+}
+
+.dialog-preview .text-component span {
+	text-shadow: calc(var(--dialog-px) * 1) calc(var(--dialog-px) * 1) var(--shadow-color, transparent);
+}
+
+.dialog-button,
+.dialog-edit-box,
+.dialog-checkbox,
+.dialog-slider-track,
+.dialog-slider-handle,
+.dialog-tooltip {
+	image-rendering: -moz-crisp-edges;
+	image-rendering: -webkit-crisp-edges;
+	image-rendering: crisp-edges;
+	image-rendering: pixelated;
+}
+
+.dialog-warning-button {
+	flex-shrink: 0;
+	background-image: url(/images/dialog/warning_button.png);
+	background-size: contain;
+}
+
+.dialog-warning-button:hover {
+	background-image: url(/images/dialog/warning_button_highlighted.png);
+}
+
+.dialog-button {
+	border: solid calc(var(--dialog-px)*2) #000;
+	border-bottom-width: calc(var(--dialog-px)*3);
+	border-image-source: url(/images/dialog/button.png);
+	border-image-slice: 2 2 3 2 fill;
+	border-image-repeat: repeat;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding-bottom: var(--dialog-px);
+	overflow: hidden;
+}
+
+.dialog-button:hover {
+	border-image-source: url(/images/dialog/button_highlighted.png);
+}
+
+.dialog-edit-box {
+	border: solid calc(var(--dialog-px) * 1) #000;
+	border-image-source: url(/images/dialog/text_field.png);
+	border-image-slice: 1 fill;
+	border-image-repeat: repeat;
+	display: flex;
+	align-items: flex-start;
+	padding-top: calc(var(--dialog-px) * 4);
+	padding-left: calc(var(--dialog-px) * 4);
+}
+
+.dialog-checkbox {
+	background-image: url(/images/dialog/checkbox.png);
+	background-size: contain;
+}
+
+.dialog-checkbox.dialog-selected {
+	background-image: url(/images/dialog/checkbox_selected.png);
+}
+
+.dialog-slider {
+	position: relative;
+}
+
+.dialog-slider-track {
+	border: solid calc(var(--dialog-px) * 1) #000;
+	border-image-source: url(/images/dialog/slider.png);
+	border-image-slice: 1 fill;
+	border-image-repeat: repeat;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.dialog-slider-handle {
+	background-image: url(/images/dialog/slider_handle.png);
+	background-size: contain;
+	position: absolute;
+	top: 0;
+	left: 50%;
+	width: calc(var(--dialog-px) * 8);
+	height: 100%;
+	transform: translateX(-50%);
+}
+
+.dialog-slider-text {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding-bottom: var(--dialog-px);
+}
+
+.tooltip-container {
+	position: relative;
+}
+
+.tooltip-container > * > * {
+	pointer-events: none;
+}
+
+.dialog-tooltip {
+	padding: var(--dialog-px);
+	border: solid calc(var(--dialog-px) * 2) #220044;
+	border-image-source: url(/images/tooltip.png);
+	border-image-slice: 2 fill;
+	border-image-outset: calc(var(--dialog-px) * 1);
+	width: max-content;
+	max-width: calc(var(--dialog-px) * 150);
+	display: none;
+	position: absolute;
+	pointer-events: none;
+	z-index: 5;
+	padding: calc(var(--dialog-px) * 2);
+}
+
+.tooltip-container:hover > .dialog-tooltip {
+	display: block;
+}
+
+.tooltip-container > .dialog-tooltip .text-component {
+	white-space: pre-wrap;
+	text-align: initial;
 }
 
 .project-files {

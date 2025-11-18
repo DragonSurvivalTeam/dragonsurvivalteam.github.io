@@ -476,6 +476,9 @@ const LootConditions: Record<string, (params: any) => LootCondition> = {
 	},
 	survives_explosion: () => () => true,
 	table_bonus: ({ chances }) => (ctx) => {
+		if (!chances) {
+			return false
+		}
 		const level = 0 // TODO: get enchantment level from tool
 		const chance = chances[clamp(level, 0, chances.length - 1)]
 		return ctx.random.nextFloat() < chance
@@ -556,8 +559,8 @@ function prepareIntRange(range: any, ctx: LootContext) {
 	if (typeof range === 'number') {
 		range = { min: range, max: range }
 	}
-	const min = computeInt(range.min, ctx)
-	const max = computeInt(range.max, ctx)
+	const min = computeInt(range?.min, ctx)
+	const max = computeInt(range?.max, ctx)
 	return { min, max }
 }
 
