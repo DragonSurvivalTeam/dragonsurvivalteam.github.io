@@ -7,6 +7,7 @@ use ::java::util::particle::Particle
 use ::java::util::text::TextColor
 use ::java::util::text::Text
 use ::java::util::block_state::BlockState
+use ::java::util::direction::Direction
 
 // FIXME :: remove
 use ::java::util::attribute::AttributeOperation
@@ -298,16 +299,29 @@ dispatch dragonsurvival:upgrade_type[dragonsurvival:condition_based] to struct C
 struct Action {
     /// Defines how the target is selected and also contains the definition for the effects
     target_selection: Targeting,
+    /// Determines when to trigger the effects
+    /// - Default: Every tick
+    /// - Charging: When the caster is charging up
+    /// - Channel Completion: When the channel is completed
+    /// (Passive Activation is only compatible with 'Default')
+    /// ('Channel Completion' is only compatible with channeled activation)
+    trigger_point?: TriggerPoint,
     /// How often the effects are triggered (current_tick % rate == 0)
     trigger_rate: LevelBasedValue
 }
+
+enum(string) TriggerPoint {
+    Default = "default",
+    Charging = "charging",
+    Channel_Completion = "channel_completion"
+}
+
+// --- Targeting --- //
 
 dispatch minecraft:resource[dragonsurvival:ability_targeting] to struct Targeting {
     target_type: #[id] TargetingType,
     ...dragonsurvival:ability_targeting[[target_type]],
 }
-
-// --- Targeting --- //
 
 enum(string) TargetingType {
     /// Targets in an x by x area around the caster
@@ -759,6 +773,31 @@ dispatch dragonsurvival:ability_entity_effect[dragonsurvival:heal] to struct Hea
     /// The percentage (1 = 100%) of the max. health of the targeted entity it will get healed by
     percentage: LevelBasedValue
 }
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:teleport] to struct TeleportEffect {
+    /// Which direction to teleport towards
+    target_direction: (
+        TeleportType |
+        Direction
+    ),
+    /// The max. distance for the teleport
+    range: LevelBasedValue
+}
+
+enum(string) TeleportType {
+    Towards_Entity = "towards_entity",
+    Looking_At = "looking_at"
+}
+
+// TODO
+// push
+// hunger
+// effect_removal
+// use_item
+// dragon_growth
+// mana_recovery
 
 // ----- # ----- //
 
