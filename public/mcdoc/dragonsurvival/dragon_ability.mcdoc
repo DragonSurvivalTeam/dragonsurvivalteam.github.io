@@ -3,7 +3,6 @@ use ::java::data::enchantment::effect::SpawnParticlesEntityEffect
 use ::java::data::advancement::predicate::ItemPredicate
 use ::java::data::advancement::predicate::EntityPredicate
 use ::java::data::loot::LootCondition
-use ::java::data::util::SoundEventRef
 use ::java::world::item::ItemStack
 use ::java::data::worldgen::feature::block_predicate::BlockPredicate
 use ::java::util::particle::Particle
@@ -67,7 +66,7 @@ struct LevelBasedResourceEntry {
 // --- Activation --- //
 
 dispatch minecraft:resource[dragonsurvival:activation] to struct Activation {
-	activation_type: #[id] ActivationType,
+	activation_type: #[id="dragonsurvival:activation"] ActivationType,
 	...dragonsurvival:activation[[activation_type]],
 }
 
@@ -90,7 +89,7 @@ dispatch dragonsurvival:activation[dragonsurvival:passive] to struct PassiveActi
 }
 
 dispatch minecraft:resource[dragonsurvival:activation_trigger] to struct ActivationTrigger {
-    trigger_type: #[id] ActivationTriggers,
+    trigger_type: #[id="dragonsurvival:activation_trigger"] ActivationTriggers,
     ...dragonsurvival:activation_trigger[[trigger_type]]
 }
 
@@ -223,7 +222,7 @@ struct CompoundAbilityAnimation {
     looping_animation_key: string,
     layer: AnimationLayer,
     /// (default: 0)
-    transition_length?: int @ 1,
+    transition_length?: int @ 0,
     locks_neck: boolean,
     locks_tail: boolean
 }
@@ -232,7 +231,7 @@ struct SimpleAbilityAnimation {
     animation_key: string,
     layer: AnimationLayer,
     /// (default: 0)
-    transition_length?: int @ 1,
+    transition_length?: int @ 0,
     locks_neck: boolean,
     locks_tail: boolean
 }
@@ -246,7 +245,7 @@ enum(string) AnimationLayer {
 // --- Upgrade Types --- //
 
 dispatch minecraft:resource[dragonsurvival:upgrade_type] to struct Upgrade {
-	upgrade_type: #[id] UpgradeType,
+	upgrade_type: #[id="dragonsurvival:upgrade_type"] UpgradeType,
 	...dragonsurvival:upgrade_type[[upgrade_type]],
 }
 
@@ -322,7 +321,7 @@ enum(string) TriggerPoint {
 // --- Targeting --- //
 
 dispatch minecraft:resource[dragonsurvival:ability_targeting] to struct Targeting {
-    target_type: #[id] TargetingType,
+    target_type: #[id="dragonsurvival:ability_targeting"] TargetingType,
     ...dragonsurvival:ability_targeting[[target_type]],
 }
 
@@ -763,8 +762,7 @@ enum(string) DisplayType {
 // ----- # ----- //
 
 dispatch dragonsurvival:ability_entity_effect[dragonsurvival:run_function] to struct RunFunctionEffect_Entity {
-    /// The minecraft function
-    function: #[id] string
+    function: #[id="function"] string
 }
 
 // ----- # ----- //
@@ -864,7 +862,7 @@ dispatch dragonsurvival:ability_entity_effect[dragonsurvival:use_item] to struct
     /// Default: 1 (100%)
     probability?: LevelBasedValue,
     /// Sound that should be played after item has been used
-    sound?: SoundEventRef,
+    sound?: #[id="sound_event"] string,
     /// Entities that the item can be used on
     valid_entities: EntityPredicate
 }
@@ -949,7 +947,7 @@ struct BlockTargeting {
 }
 
 dispatch minecraft:resource[dragonsurvival:ability_block_effect] to struct BlockEffect {
-    effect_type: #[id] BlockEffectType,
+    effect_type: #[id="dragonsurvival:ability_block_effect"] BlockEffectType,
     ...dragonsurvival:ability_block_effect[[effect_type]],
 }
 
@@ -1052,8 +1050,7 @@ dispatch dragonsurvival:ability_block_effect[dragonsurvival:particle] to struct 
 // ----- # ----- //
 
 dispatch dragonsurvival:ability_block_effect[dragonsurvival:run_function] to struct RunFunctionEffect_Block {
-    /// The minecraft function
-    function: #[id] string
+    function: #[id="function"] string
 }
 
 // ----- # ----- //
@@ -1065,7 +1062,7 @@ dispatch dragonsurvival:ability_block_effect[dragonsurvival:use_item] to struct 
     /// Default: 1 (100%)
     probability?: LevelBasedValue,
     /// Sound that should be played after item has been used
-    sound?: SoundEventRef,
+    sound?: #[id="sound_event"] string,
     /// Blocks that the item can be used on
     valid_blocks: BlockPredicate
 }

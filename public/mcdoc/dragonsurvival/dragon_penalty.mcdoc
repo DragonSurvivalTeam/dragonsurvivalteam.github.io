@@ -66,7 +66,7 @@ dispatch minecraft:resource[dragonsurvival:dragon_penalty] to struct DragonPenal
 // ----- Penalty Effects ----- //
 
 dispatch minecraft:resource[dragonsurvival:penalty_effect] to struct PenaltyEffect {
-	penalty_type: #[id] PenaltyType,
+	penalty_type: #[id="dragonsurvival:penalty_effect"] PenaltyType,
 	...dragonsurvival:penalty_effect[[penalty_type]],
 }
 
@@ -75,7 +75,11 @@ enum(string) PenaltyType {
     Mob_Effect = "dragonsurvival:mob_effect",
     Item_Blacklist = "dragonsurvival:item_blacklist",
     Damage_Modification = "dragonsurvival:damage_modification",
-    Fear = "dragonsurvival:fear"
+    Fear = "dragonsurvival:fear",
+    Informational = "dragonsurvival:informational",
+    Modifier = "dragonsurvival:modifier",
+    Effect_Modification = "dragonsurvival:effect_modification",
+    Run_Function = "dragonsurvival:run_function"
 }
 
 // ----- # ----- //
@@ -128,10 +132,76 @@ struct Fear {
     sprint_speed?: LevelBasedValue
 }
 
+// ----- # ----- //
+
+dispatch dragonsurvival:penalty_effect[dragonsurvival:fear] to struct FearPenalty {
+    fears: [Fear]
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:penalty_effect[dragonsurvival:informational] to struct InformationalPenalty { }
+
+// ----- # ----- //
+
+dispatch dragonsurvival:penalty_effect[dragonsurvival:informational] to struct InformationalPenalty {
+    modifiers: [ModifierWithDuration]
+}
+
+// FIXME :: Copied from ability definitions
+
+struct ModifierWithDuration {
+    base: DurationInstanceBase,
+    modifiers: [Modifier]
+}
+
+struct Modifier {
+    attribute: #[id="attribute"] string,
+    amount: (
+        LevelBasedValue |
+        PreciseLevelBasedValue |
+    ),
+    operation: AttributeOperation
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:penalty_effect[dragonsurvival:effect_modification] to struct EffectModificationPenalty {
+    modifications: [EffectModification]
+}
+
+// FIXME :: Copied from ability definitions
+
+struct EffectModification {
+    base: DurationInstanceBase,
+    effects?: (
+        #[id(registry="mob_effect", tags="allowed")] string |
+        [#[id="mob_effect"] string] |
+    ),
+    duration_modification?: Modification,
+    amplifier_modification?: Modification
+}
+
+struct Modification {
+    type: ModificationType,
+    amount: LevelBasedValue
+}
+
+enum(string) ModificationType {
+    Additive = "additive",
+    Multiplicative = "multiplicative"
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:penalty_effect[dragonsurvival:run_function] to struct RunFunctionPenalty {
+    function: #[id="function"] string
+}
+
 // ----- Penalty Triggers ----- //
 
 dispatch minecraft:resource[dragonsurvival:penalty_trigger] to struct PenaltyTrigger {
-	penalty_trigger: #[id] PenaltyTriggerType,
+	penalty_trigger: #[id="dragonsurvival:penalty_trigger"] PenaltyTriggerType,
 	...dragonsurvival:penalty_trigger[[penalty_trigger]],
 }
 

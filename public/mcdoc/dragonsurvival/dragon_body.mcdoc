@@ -100,7 +100,7 @@ struct DragonEmote {
 }
 
 struct Sound {
-    sound_event: abc,
+    sound_event: #[id="sound_event"] string,
     /// Volume of the sound (default: 1)
     volume?: float @ 0..,
     /// Pitch of the sound (default: 1)
