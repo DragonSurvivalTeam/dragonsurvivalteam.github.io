@@ -404,13 +404,21 @@ function UnionHead({ type, optional, node, ctx }: Props<UnionType<SimplifiedMcdo
 	}, [type, node, ctx, selectedType])
 
 	const memberIndex = selectedType ? type.members.findIndex(m => quickEqualTypes(m, selectedType)) : -1
+	const usedNames = new Set<string>()
 
 	return <>
 		<select value={memberIndex > -1 ? memberIndex : SPECIAL_UNSET} onInput={(e) => onSelect((e.target as HTMLSelectElement).value)}>
 			{(selectedType === undefined || optional) && <option value={SPECIAL_UNSET}>{locale('unset')}</option>}
-			{type.members.map((member, index) =>
-				<option value={index}>{formatUnionMember(member, type.members.filter(m => m !== member))}</option>
-			)}
+			{type.members.map((member, index) => {
+				let name = formatUnionMember(member, type.members.filter(m => m !== member))
+                
+				if (usedNames.has(name)) {
+					name += ` ${index}`
+				}
+                
+				usedNames.add(name)
+				return <option value={index}>{name}</option>
+			})}
 		</select>
 		{selectedType && selectedType.kind !== 'literal' && <Head type={selectedType} node={node} ctx={ctx} />}
 	</>

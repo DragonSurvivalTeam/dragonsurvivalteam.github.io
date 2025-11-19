@@ -118,8 +118,9 @@ export function getDefault(type: SimplifiedMcdocType, range: core.Range, ctx: co
 	if (isListOrArray(type)) {
 		const array = JsonArrayNode.mock(range)
 		const minLength = type.lengthRange?.min ?? 0
-		if (minLength > 0) {
-			for (let i = 0; i < minLength; i += 1) {
+		const count = (type.lengthRange?.max === 0) ? 0 : Math.max(1, minLength)
+		if (count > 0) {
+			for (let i = 0; i < count; i += 1) {
 				const child = getDefault(simplifyType(getItemType(type), ctx), range, ctx)
 				const itemNode: core.ItemNode<JsonNode> = {
 					type: 'item',
@@ -488,6 +489,20 @@ export function quickEqualTypes(a: SimplifiedMcdocTypeNoUnion, b: SimplifiedMcdo
 		const keyB = b.fields[0]?.key
 		return (!keyA && !keyB) || (keyA && keyB && quickEqualTypes(keyA, keyB))
 	}
-	// Types are of the same kind	
+
+	if (a.kind === 'list' && b.kind === 'list') {
+		return quickEqual(a.item as SimplifiedMcdocType, b.item as SimplifiedMcdocType)
+	}
+
+	// Types are of the same kind
 	return true
+}
+
+function quickEqual(a: SimplifiedMcdocType, b: SimplifiedMcdocType): boolean {
+	if (a.kind === 'union' && b.kind === 'union') {
+		if (a.members.length !== b.members.length) return false
+		return a.members.every((m, i) => quickEqualTypes(m, b.members[i]))
+	}
+	if (a.kind === 'union' || b.kind === 'union') return false
+	return quickEqualTypes(a, b)
 }
