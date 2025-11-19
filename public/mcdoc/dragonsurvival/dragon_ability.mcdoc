@@ -1,8 +1,11 @@
 use ::java::data::enchantment::LevelBasedValue
-use ::java::data::enchantment::SpawnParticlesEntityEffect
-use ::java::data::loot::LootCondition
+use ::java::data::enchantment::effect::SpawnParticlesEntityEffect
 use ::java::data::advancement::predicate::ItemPredicate
-use ::java::data::advancement::predicate::BlockPredicate
+use ::java::data::advancement::predicate::EntityPredicate
+use ::java::data::loot::LootCondition
+use ::java::data::util::SoundEventRef
+use ::java::world::item::ItemStack
+use ::java::data::worldgen::feature::block_predicate::BlockPredicate
 use ::java::util::particle::Particle
 use ::java::util::text::TextColor
 use ::java::util::text::Text
@@ -395,8 +398,7 @@ struct EntityTargeting {
 }
 
 dispatch minecraft:resource[dragonsurvival:ability_entity_effect] to struct EntityEffect {
-    // FIXME :: 'effect_type: #[id="dragonsurvival:ability_entity_effect"] string,' does not suggest any types when clicking the field
-    effect_type: #[id] EntityEffectType,
+    effect_type: #[id="dragonsurvival:ability_entity_effect"] EntityEffectType,
     ...dragonsurvival:ability_entity_effect[[effect_type]],
 }
 
@@ -421,7 +423,15 @@ enum(string) EntityEffectType {
     Oxygen_Bonus = "dragonsurvival:oxygen_bonus",
     Block_Vision = "dragonsurvival:block_vision",
     Run_Function = "dragonsurvival:run_function",
-    Smelting = "dragonsurvival:smelting"
+    Smelting = "dragonsurvival:smelting",
+    Heal = "dragonsurvival:heal",
+    Teleport = "dragonsurvival:teleport",
+    Push = "dragonsurvival:push",
+    Hunger = "dragonsurvival:hunger",
+    Effect_Removal = "dragonsurvival:effect_removal",
+    Use_Item = "dragonsurvival:use_item",
+    Dragon_Growth = "dragonsurvival:dragon_growth",
+    Mana_Recovery = "dragonsurvival:mana_recovery"
 }
 
 enum(string) TargetingMode {
@@ -500,7 +510,10 @@ dispatch dragonsurvival:ability_entity_effect[dragonsurvival:summon_entity] to s
     ),
     /// Max. amount of entities that will be summoned per instance
     max_summons: LevelBasedValue,
+    /// Attribute modifications that will be applied to the summoned entities
     attribute_scales?: [AttributeScale],
+    /// NBT data that will be merged into the summoned entities
+    nbt?: any,
     /// If enabled the entity will be owned by the summoner and be considered an ally (default: true)
     /// (It also means that the attack and movement behavior can be changed through the related keybind)
     is_allied?: boolean
@@ -778,26 +791,129 @@ dispatch dragonsurvival:ability_entity_effect[dragonsurvival:heal] to struct Hea
 
 dispatch dragonsurvival:ability_entity_effect[dragonsurvival:teleport] to struct TeleportEffect {
     /// Which direction to teleport towards
+    /// Options are custom types and the vanilla directions
     target_direction: (
-        TeleportType |
+        CustomDirection |
         Direction
     ),
     /// The max. distance for the teleport
     range: LevelBasedValue
 }
 
-enum(string) TeleportType {
+enum(string) CustomDirection {
     Towards_Entity = "towards_entity",
     Looking_At = "looking_at"
 }
 
-// TODO
-// push
-// hunger
-// effect_removal
-// use_item
-// dragon_growth
-// mana_recovery
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:push] to struct PushEffect {
+    /// Which direction the entity should be pushed towards
+    /// Options are custom types and the vanilla directions
+    target_direction: (
+        CustomDirection |
+        Direction
+    ),
+    /// The max. distance for the teleport
+    push_force: LevelBasedValue
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:hunger] to struct HungerEffect {
+    /// By how much the food level will increase
+    hunger_gain?: LevelBasedValue,
+    /// By how much the saturation will increase
+    saturation_gain?: LevelBasedValue,
+    /// If present limits the saturation gain
+    /// (Applicable to flat gain and the conversion mechanic)
+    maximum_saturation?: LevelBasedValue,
+    /// If present any restored hunger above the maximum (vanilla cap of 20) will be converted into saturation
+    /// (The additional restored hunger will be multiplied by this value to calculate the saturation gain)
+    conversion_rate?: LevelBasedValue
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:effect_removal] to struct MobEffectRemovalEffect {
+    /// Which effect categories should be considered
+    categories?: [MobEffectCategory],
+    /// Explicit effects that should be removed
+    valid_effects?: (
+        #[id(registry="mob_effect", tags="allowed")] string |
+        [#[id="mob_effect"] string] |
+    ),
+    /// Maximum amount of effects that can be removed
+    max_amount?: int @ 1..,
+    /// Highest level / amplifier that can be removed
+    maximum_effect_level?: byte @ 0..255
+}
+
+enum(string) MobEffectCategory {
+    Beneficial = "beneficial",
+    Harmful = "harmful",
+    Neutral = "neutral"
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:use_item] to struct UseItemOnEntityEffect {
+    /// Item that should be simulated
+    item: ItemStack,
+    /// 0 (0%) to 1 (100%)
+    /// Default: 1 (100%)
+    probability?: LevelBasedValue,
+    /// Sound that should be played after item has been used
+    sound?: SoundEventRef,
+    /// Entities that the item can be used on
+    valid_entities: EntityPredicate
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:dragon_growth] to struct DragonGrowthEffect {
+    /// How the current growth should be modified
+    /// - Set: Sets the growth to the specified value
+    ///        - When using 'Percent' the base will not be 0 but rather min_growth (current stage)
+    /// - Add: Adds the specified value to the current growth
+    growth_type: ActionType,
+    /// In which format the value is specified
+    /// - Flat: Takes the value as-is
+    /// - Percent: Scales off of the bounds of the current stage
+    ///            - Formula: amount * (max_growth - min_growth) (both values from the current stage)
+    action_type: AdjustmentType,
+    amount: LevelBasedValue,
+    /// 0 (0%) to 1 (100%)
+    /// Default: 1 (100%)
+    probability?: LevelBasedValue
+}
+
+enum(string) ActionType {
+    Set = "set",
+    Add = "add"
+}
+
+enum(string) AdjustmentType {
+    Percent = "percent",
+    Flat = "flat"
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:mana_recovery] to struct ManaRecoveryEffect {
+    /// How the current mana should be modified
+    /// - Set: Sets the mana to the specified value
+    /// - Add: Adds the specified value to the current mana
+    action_type: ActionType,
+    /// In which format the value is specified
+    /// - Flat: Takes the value as-is
+    /// - Percent: Scales off of the max. mana the player can have (1 = 100% of max. mana)
+    adjustment_type: AdjustmentType,
+    amount: LevelBasedValue,
+    /// 0 (0%) to 1 (100%)
+    /// Default: 1 (100%)
+    probability?: LevelBasedValue
+}
 
 // ----- # ----- //
 
@@ -807,8 +923,10 @@ struct DurationInstanceBase {
     /// (default: Infinite)
     duration?: LevelBasedValue,
     /// If enabled the created instances will be removed when (default: false):
+    /// - The caster is not online or in a different dimension
     /// - The ability of the caster is no longer active (applies to all instances)
     /// - The target conditions for the ability no longer match (only applies to instances of the caster)
+    /// - The target is out of range that is specified in the ability
     should_remove_automatically?: boolean,
     /// Condition which causes the instances to be removed when matched
     early_removal_condition?: LootCondition,
@@ -843,7 +961,10 @@ enum(string) BlockEffectType {
     Area_Cloud = "dragonsurvival:area_cloud",
     Block_Break = "dragonsurvival:block_break",
     Particle = "dragonsurvival:particle",
-    Run_Function = "dragonsurvival:run_function"
+    Run_Function = "dragonsurvival:run_function",
+    Use_Item = "dragonsurvival:use_item",
+    Explosion = "dragonsurvival:explosion",
+    Block_Harvest = "dragonsurvival:block_harvest"
 }
 
 // ----- # ----- //
@@ -888,7 +1009,10 @@ dispatch dragonsurvival:ability_block_effect[dragonsurvival:summon_entity] to st
     ),
     /// Max. amount of entities that will be summoned per instance
     max_summons: LevelBasedValue,
+    /// Attribute modifications that will be applied to the summoned entities
     attribute_scales?: [AttributeScale],
+    /// NBT data that will be merged into the summoned entities
+    nbt?: any,
     /// If enabled the entity will be owned by the summoner and be considered an ally (default: true)
     /// (It also means that the attack and movement behavior can be changed through the related keybind)
     is_allied?: boolean
@@ -912,16 +1036,10 @@ dispatch dragonsurvival:ability_block_effect[dragonsurvival:area_cloud] to struc
 // ----- # ----- //
 
 dispatch dragonsurvival:ability_block_effect[dragonsurvival:block_break] to struct BlockBreakEffect {
-    valid_blocks: BlockPredicateSpecial,
+    valid_blocks: BlockPredicate,
     probability: LevelBasedValue,
     /// (default: false)
     drop_loot?: boolean
-}
-
-// FIXME :: already defined in ::java::data::worldgen::feature but it would clash with the normal block predicate
-struct BlockPredicateSpecial {
-	type: #[id="block_predicate_type"] string,
-	...minecraft:block_predicate[[type]],
 }
 
 // ----- # ----- //
@@ -937,3 +1055,42 @@ dispatch dragonsurvival:ability_block_effect[dragonsurvival:run_function] to str
     /// The minecraft function
     function: #[id] string
 }
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_block_effect[dragonsurvival:use_item] to struct UseItemOnBlockEffect {
+    /// Item that should be simulated
+    item: ItemStack,
+    /// 0 (0%) to 1 (100%)
+    /// Default: 1 (100%)
+    probability?: LevelBasedValue,
+    /// Sound that should be played after item has been used
+    sound?: SoundEventRef,
+    /// Blocks that the item can be used on
+    valid_blocks: BlockPredicate
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_block_effect[dragonsurvival:explosion] to struct ExplodeEffect {
+    probability?: LevelBasedValue,
+    power: LevelBasedValue,
+    /// Whether the explosion can cause fire
+    /// (Default: true)
+    fire?: boolean,
+    damage_type: #[id="damage_type"] string
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_block_effect[dragonsurvival:block_harvest] to struct BlockHarvestEffect {
+    valid_blocks: BlockPredicate,
+    /// 0 (0%) to 1 (100%)
+    /// Default: 1 (100%)
+    probability?: LevelBasedValue,
+    /// Whether the harvested block drops its resources
+    /// (Default: false)
+    drop_loot?: boolean
+}
+
+// ----- # ----- //

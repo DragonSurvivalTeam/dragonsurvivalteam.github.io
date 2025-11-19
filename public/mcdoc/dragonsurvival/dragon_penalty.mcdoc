@@ -14,8 +14,10 @@ struct DurationInstanceBase {
     id: #[id] string,
     duration: LevelBasedValue,
     /// If enabled the created instances will be removed when (default: false):
+    /// - The caster is not online or in a different dimension
     /// - The ability of the caster is no longer active (applies to all instances)
     /// - The target conditions for the ability no longer match (only applies to instances of the caster)
+    /// - The target is out of range that is specified in the ability
     should_remove_automatically?: boolean,
     /// Condition which causes the instances to be removed when matched
     early_removal_condition?: LootCondition,
