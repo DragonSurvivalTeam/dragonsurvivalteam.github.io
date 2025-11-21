@@ -9,6 +9,10 @@ use ::java::util::particle::Particle
 // use super::dragon_ability::PotionData
 // use super::dragon_ability::DamageModification
 
+
+// FIXME :: remove once import from stage or w/e works
+use ::java::util::attribute::AttributeOperation
+
 struct DurationInstanceBase {
     /// Unique id for the instance to be created
     id: #[id] string,
@@ -144,7 +148,7 @@ dispatch dragonsurvival:penalty_effect[dragonsurvival:informational] to struct I
 
 // ----- # ----- //
 
-dispatch dragonsurvival:penalty_effect[dragonsurvival:informational] to struct InformationalPenalty {
+dispatch dragonsurvival:penalty_effect[dragonsurvival:modifier] to struct ModifierPenalty {
     modifiers: [ModifierWithDuration]
 }
 
@@ -162,6 +166,11 @@ struct Modifier {
         PreciseLevelBasedValue |
     ),
     operation: AttributeOperation
+}
+
+struct PreciseLevelBasedValue {
+    precise_base: float,
+    precise_amount: float
 }
 
 // ----- # ----- //
