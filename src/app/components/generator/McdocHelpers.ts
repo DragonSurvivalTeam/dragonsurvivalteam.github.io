@@ -494,6 +494,37 @@ export function quickEqualTypes(a: SimplifiedMcdocTypeNoUnion, b: SimplifiedMcdo
 		return quickEqual(a.item as SimplifiedMcdocType, b.item as SimplifiedMcdocType)
 	}
 
+	// Compare enums in a more detailed way
+	// Otherwise selecting enum 2 will display the UI as if enum 1 has been selected
+	// While showing values of enum 2 - making it impossible at this point to select enum 1
+	if (a.kind === 'enum' && b.kind === 'enum') {
+		const kindA = a.enumKind ?? 'string'
+		const kindB = b.enumKind ?? 'string'
+
+		if (kindA !== kindB) {
+			// Enums contain different data types
+			return false
+		}
+
+		if (a.values.length !== b.values.length) {
+			// Enum have differing number of values
+			return false
+		}
+
+		for (let i = 0; i < a.values.length; i += 1) {
+			const va = a.values[i]
+			const vb = b.values[i]
+
+			if (va.identifier !== vb.identifier) {
+				return false
+			}
+
+			if (va.value !== vb.value) {
+				return false
+			}
+		}
+	}
+
 	// Types are of the same kind
 	return true
 }

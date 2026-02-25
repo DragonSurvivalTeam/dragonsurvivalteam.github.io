@@ -790,10 +790,12 @@ dispatch dragonsurvival:ability_entity_effect[dragonsurvival:heal] to struct Hea
 dispatch dragonsurvival:ability_entity_effect[dragonsurvival:teleport] to struct TeleportEffect {
     /// Which direction to teleport towards
     /// Options are custom types and the vanilla directions
-    target_direction: (
-        CustomDirection |
-        Direction
-    ),
+    target_direction: struct {
+        direction: (
+            CustomDirection |
+            Direction
+        )
+    },
     /// The max. distance for the teleport
     range: LevelBasedValue
 }
@@ -808,10 +810,12 @@ enum(string) CustomDirection {
 dispatch dragonsurvival:ability_entity_effect[dragonsurvival:push] to struct PushEffect {
     /// Which direction the entity should be pushed towards
     /// Options are custom types and the vanilla directions
-    target_direction: (
-        CustomDirection |
-        Direction
-    ),
+    target_direction: struct {
+        direction: (
+            CustomDirection |
+            Direction
+        )
+    },
     /// The max. distance for the teleport
     push_force: LevelBasedValue
 }
