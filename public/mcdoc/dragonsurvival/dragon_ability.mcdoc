@@ -453,7 +453,11 @@ enum(string) TargetingMode {
     /// - Mobs targeting the caster
     Enemies = "enemies",
     /// Targets items
-    Items = "items"
+    Items = "items",
+    /// Excludes experience orbs
+    experience_orbs = "experience_orbs",
+    /// Targets any entity except the caster
+    AllExceptSelf   = "all_except_self",
 }
 
 // ----- # ----- //
