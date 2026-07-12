@@ -173,6 +173,8 @@ dispatch dragonsurvival:activation[dragonsurvival:channeled] to struct Channeled
     cast_time?: LevelBasedValue,
     /// Cooldown that gets applied once the cast has finished
     cooldown?: LevelBasedValue,
+    /// Maximum duration of the channeled ability (in ticks)
+    max_duration?: LevelBasedValue,
     /// Specifies which message is displayed when:
     /// - Not enough mana is available to initiate the cast
     /// - The ability is blocked ('usage_blocked' condition)
@@ -222,7 +224,7 @@ struct CompoundAbilityAnimation {
     looping_animation_key: string,
     layer: AnimationLayer,
     /// (default: 0)
-    transition_length?: int @ 0,
+    transition_length?: int @ 0..,
     locks_neck: boolean,
     locks_tail: boolean
 }
@@ -231,7 +233,7 @@ struct SimpleAbilityAnimation {
     animation_key: string,
     layer: AnimationLayer,
     /// (default: 0)
-    transition_length?: int @ 0,
+    transition_length?: int @ 0..,
     locks_neck: boolean,
     locks_tail: boolean
 }
@@ -430,7 +432,9 @@ enum(string) EntityEffectType {
     Effect_Removal = "dragonsurvival:effect_removal",
     Use_Item = "dragonsurvival:use_item",
     Dragon_Growth = "dragonsurvival:dragon_growth",
-    Mana_Recovery = "dragonsurvival:mana_recovery"
+    Mana_Recovery = "dragonsurvival:mana_recovery",
+    Experience = "dragonsurvival:experience",
+    Cooldown_Recovery = "dragonsurvival:cooldown_recovery",
 }
 
 enum(string) TargetingMode {
@@ -449,7 +453,11 @@ enum(string) TargetingMode {
     /// - Mobs targeting the caster
     Enemies = "enemies",
     /// Targets items
-    Items = "items"
+    Items = "items",
+    /// Excludes experience orbs
+    experience_orbs = "experience_orbs",
+    /// Targets any entity except the caster
+    AllExceptSelf   = "all_except_self",
 }
 
 // ----- # ----- //
@@ -494,7 +502,24 @@ struct PotionData {
 // ----- # ----- //
 
 // TODO
-dispatch dragonsurvival:ability_entity_effect[dragonsurvival:projectile] to struct ProjectileEffect { }
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:projectile] to struct ProjectileEffect {
+    /// Custom projectile data for this ability
+    /// - Can reference external files in `data/dragonsurvival/projectile_data`, e.g. `"dragonsurvival:ball_lightning"`
+    projectile_data: #[id(registry="dragonsurvival:projectile_data")] string,
+    /// Direction to fire the projectile
+    target_direction: struct {
+        direction: (
+            CustomDirection |
+            Direction
+        )
+    },
+    /// Number of projectiles fired per use
+    number_of_projectiles: LevelBasedValue,
+    /// Spread of the projectile trajectory
+    projectile_spread?: LevelBasedValue,
+    /// Initial speed of the projectile
+    speed: LevelBasedValue,
+}
 
 // ----- # ----- //
 
@@ -661,7 +686,7 @@ dispatch dragonsurvival:ability_entity_effect[dragonsurvival:swim] to struct Swi
     /// (A value of '-1' means unlimited oxygen)
     max_oxygen: LevelBasedValue,
     /// The fluid type the entity can swim in
-    fluid_type: #[id="neoforge:fluid_type] string
+    fluid_type: #[id="neoforge:fluid_type"] string
 }
 
 // ----- # ----- //
@@ -936,6 +961,44 @@ struct DurationInstanceBase {
     custom_icon?: #[id] string,
     /// If enabled the instance won't be shown as effect (default: false)
     is_hidden?: boolean
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:experience] to struct ExperienceEffect {
+    experience_type: ExperienceType,
+    amount: LevelBasedValue,
+    /// 0 (0%) to 1 (100%)
+    /// Default: 1 (100%)
+    probability?: LevelBasedValue,
+}
+
+enum(string) ExperienceType {
+    LEVELS = "levels",
+    POINTS = "points",
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:cooldown_recovery] to struct CooldownRecoveryEffect {
+    /// Optional set of abilities
+    abilities?: #[id(registry="dragonsurvival:dragon_ability", tags="allowed")] string,
+    /// Determines how the change is applied
+    action_type: CooldownRecoveryActionType,
+    /// Determines how the value is calculated
+    adjustment_type: AdjustmentType,
+    amount: LevelBasedValue,
+    /// 0 (0%) to 1 (100%)
+    /// Default: 1 (100%)
+    probability?: LevelBasedValue,
+    /// Whether to exclude the ability itself
+    /// (Default: true)
+    exclude_this?: boolean,
+}
+
+enum(string) CooldownRecoveryActionType {
+    Set = "set",
+    Reduce = "reduce"
 }
 
 // --- Ability Block Effects --- //
