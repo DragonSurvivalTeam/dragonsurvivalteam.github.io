@@ -222,7 +222,7 @@ struct CompoundAbilityAnimation {
     looping_animation_key: string,
     layer: AnimationLayer,
     /// (default: 0)
-    transition_length?: int @ 0,
+    transition_length?: int @ 0..,
     locks_neck: boolean,
     locks_tail: boolean
 }
@@ -231,7 +231,7 @@ struct SimpleAbilityAnimation {
     animation_key: string,
     layer: AnimationLayer,
     /// (default: 0)
-    transition_length?: int @ 0,
+    transition_length?: int @ 0..,
     locks_neck: boolean,
     locks_tail: boolean
 }
