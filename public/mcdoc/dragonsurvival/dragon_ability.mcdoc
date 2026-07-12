@@ -430,7 +430,9 @@ enum(string) EntityEffectType {
     Effect_Removal = "dragonsurvival:effect_removal",
     Use_Item = "dragonsurvival:use_item",
     Dragon_Growth = "dragonsurvival:dragon_growth",
-    Mana_Recovery = "dragonsurvival:mana_recovery"
+    Mana_Recovery = "dragonsurvival:mana_recovery",
+    Experience = "dragonsurvival:experience",
+    Cooldown_Recovery = "dragonsurvival:cooldown_recovery",
 }
 
 enum(string) TargetingMode {
@@ -936,6 +938,44 @@ struct DurationInstanceBase {
     custom_icon?: #[id] string,
     /// If enabled the instance won't be shown as effect (default: false)
     is_hidden?: boolean
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:experience] to struct ExperienceEffect {
+    experience_type: ExperienceType,
+    amount: LevelBasedValue,
+    /// 0 (0%) to 1 (100%)
+    /// Default: 1 (100%)
+    probability?: LevelBasedValue,
+}
+
+enum(string) ExperienceType {
+    LEVELS = "levels",
+    POINTS = "points",
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:cooldown_recovery] to struct CooldownRecoveryEffect {
+    /// Optional set of abilities
+    abilities?: #[id(registry="dragonsurvival:dragon_ability", tags="allowed")] string,
+    /// Determines how the change is applied
+    action_type: CooldownRecoveryActionType,
+    /// Determines how the value is calculated
+    adjustment_type: AdjustmentType,
+    amount: LevelBasedValue,
+    /// 0 (0%) to 1 (100%)
+    /// Default: 1 (100%)
+    probability?: LevelBasedValue,
+    /// Whether to exclude the ability itself
+    /// (Default: true)
+    exclude_this?: boolean,
+}
+
+enum(string) CooldownRecoveryActionType {
+    Set = "set",
+    Reduce = "reduce"
 }
 
 // --- Ability Block Effects --- //
