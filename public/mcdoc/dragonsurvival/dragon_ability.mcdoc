@@ -502,7 +502,24 @@ struct PotionData {
 // ----- # ----- //
 
 // TODO
-dispatch dragonsurvival:ability_entity_effect[dragonsurvival:projectile] to struct ProjectileEffect { }
+dispatch dragonsurvival:ability_entity_effect[dragonsurvival:projectile] to struct ProjectileEffect {
+    /// Custom projectile data for this ability
+    /// - Can reference external files in `data/dragonsurvival/projectile_data`, e.g. `"dragonsurvival:ball_lightning"`
+    projectile_data: #[id(registry="dragonsurvival:projectile_data")] string,
+    /// Direction to fire the projectile
+    target_direction: struct {
+        direction: (
+            CustomDirection |
+            Direction
+        )
+    },
+    /// Number of projectiles fired per use
+    number_of_projectiles: LevelBasedValue,
+    /// Spread of the projectile trajectory
+    projectile_spread?: LevelBasedValue,
+    /// Initial speed of the projectile
+    speed: LevelBasedValue,
+}
 
 // ----- # ----- //
 
