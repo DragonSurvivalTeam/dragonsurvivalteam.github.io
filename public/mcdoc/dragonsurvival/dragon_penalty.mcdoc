@@ -104,7 +104,13 @@ dispatch dragonsurvival:penalty_effect[dragonsurvival:mob_effect] to struct MobE
 dispatch dragonsurvival:penalty_effect[dragonsurvival:item_blacklist] to struct ItemBlacklistPenalty {
     /// A valid resource location (namespace:path)
     /// Regular expressions are allowed in namespace and path
-	items: string,
+	items: (
+        [(
+            #[id="item"] string |
+            #[regex_pattern] string |
+        )] |
+        string
+    ),
 }
 
 // ----- # ----- //
