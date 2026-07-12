@@ -661,7 +661,7 @@ dispatch dragonsurvival:ability_entity_effect[dragonsurvival:swim] to struct Swi
     /// (A value of '-1' means unlimited oxygen)
     max_oxygen: LevelBasedValue,
     /// The fluid type the entity can swim in
-    fluid_type: #[id="neoforge:fluid_type] string
+    fluid_type: #[id="neoforge:fluid_type"] string
 }
 
 // ----- # ----- //
