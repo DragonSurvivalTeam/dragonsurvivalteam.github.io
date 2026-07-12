@@ -173,6 +173,8 @@ dispatch dragonsurvival:activation[dragonsurvival:channeled] to struct Channeled
     cast_time?: LevelBasedValue,
     /// Cooldown that gets applied once the cast has finished
     cooldown?: LevelBasedValue,
+    /// Maximum duration of the channeled ability (in ticks)
+    max_duration?: LevelBasedValue,
     /// Specifies which message is displayed when:
     /// - Not enough mana is available to initiate the cast
     /// - The ability is blocked ('usage_blocked' condition)
