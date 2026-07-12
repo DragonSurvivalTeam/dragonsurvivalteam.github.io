@@ -1,0 +1,357 @@
+use ::java::data::enchantment::LevelBasedValue
+use ::java::data::enchantment::effect::SpawnParticlesEntityEffect
+use ::java::data::loot::LootCondition
+use ::java::util::particle::Particle
+use ::java::util::direction::Direction
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+dispatch minecraft:resource[dragonsurvival:projectile_data] to struct ProjectileData {
+    /// General behavior of the custom projectile
+    general_data: GeneralData,
+    /// Visual appearance of the custom projectile
+    /// - `texture` + `piercing_level`: custom arrow entity
+    /// - `resources` + `behaviour_data`: custom fireball entity
+    type_data: (
+        GenericArrowData |
+        GenericBallData |
+    ),
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+struct GeneralData {
+    /// Registry name of the custom projectile
+    name: #[projectile_data(definition=true)] string,
+    /// Whether the projectile can break blocks like decorated pots or chorus flowers
+    /// (Default: false)
+    is_impact_projectile?: boolean,
+    /// Effects executed when the projectile hits a block
+    /// - Executor: `server`
+    /// - Position: Center of the hit block
+    block_hit_effects: [ProjectileBlockEffect],
+    /// Effects executed on any hit
+    /// - `world_effect`
+    ///   - `dragonsurvival:point`
+    ///      - Executor: Projectile itself
+    ///      - Position: Hit position (on the projectile's trajectory)
+    ///   - `dragonsurvival:area`
+    ///      - Executor: Projectile itself
+    ///      - Position: All matching entities within range (excluding the projectile)
+    /// - `entity_effect`
+    ///   - `dragonsurvival:point`
+    ///     - No effect
+    ///   - `dragonsurvival:area`
+    ///     - Executor: All matching entities within range (excluding the projectile)
+    ///     - Position: Hit position (on the projectile's trajectory)
+    /// - `block_effect`
+    ///   - `dragonsurvival:point`
+    ///     - Executor: `server`
+    ///     - Position: Center of the hit block (on the projectile's trajectory)
+    ///   - `dragonsurvival:area`
+    ///     - Executor: `server`
+    ///     - Position: Center of all matching blocks within range around the projectile
+    common_hit_effects: [ProjectileTargeting],
+    /// Predicate for entity hit effects
+    /// Provides context between the caster and target, allowing for proper ally or enemy checks
+    entity_hit_condition: (LootCondition | [LootCondition]),
+    /// Effects executed when the projectile hits an entity
+    /// - Executor: The hit entity
+    /// - Position: The hit entity
+    entity_hit_effects: [ProjectileEntityEffect],
+    /// Effects executed every tick while the projectile is in flight
+    /// - `world_effect`
+    ///   - `dragonsurvival:point`
+    ///      - Executor: Projectile itself
+    ///      - Position: Hit position (on the projectile's trajectory)
+    ///   - `dragonsurvival:area`
+    ///      - Executor: Projectile itself
+    ///      - Position: All matching entities within range (excluding the projectile)
+    /// - `entity_effect`
+    ///   - `dragonsurvival:point`
+    ///     - No effect
+    ///   - `dragonsurvival:area`
+    ///     - Executor: All matching entities within range (excluding the projectile)
+    ///     - Position: Hit position (on the projectile's trajectory)
+    /// - `block_effect`
+    ///   - `dragonsurvival:point`
+    ///     - Executor: `server`
+    ///     - Position: Center of the hit block (on the projectile's trajectory)
+    ///   - `dragonsurvival:area`
+    ///     - Executor: `server`
+    ///     - Position: Center of all matching blocks within range around the projectile
+    ticking_effects: [ProjectileTargeting],
+}
+// --- Special Executors --- //
+struct ProjectileTargeting {
+    /// Defines the effects
+    general_data: ProjectileTargeting_GeneralData,
+    target_type: TargetingType,
+    ...dragonsurvival:projectile_targeting[[target_type]],
+}
+
+enum(string) TargetingType {
+    Area    = "dragonsurvival:area",
+    Point   = "dragonsurvival:point",
+}
+
+dispatch dragonsurvival:projectile_targeting[dragonsurvival:area] to struct AreaTarget {
+    radius: LevelBasedValue,
+    particle_trail?: Particle,
+}
+
+struct ProjectileTargeting_GeneralData {
+    /// List of effects to execute
+    effects: [ProjectileTargeting_GeneralData_Effect],
+    /// Execution frequency (current_tick % rate == 0)
+    /// (Default: 0)
+    tick_rate?: int,
+    /// Execution probability
+    /// (Default: 1)
+    chance?: float,
+}
+
+struct ProjectileTargeting_GeneralData_Effect {
+    effect: (
+        ProjectileBlockEffect |
+        ProjectileEntityEffect |
+        ProjectileWorldEffect |
+    ),
+    condition?: LootCondition,
+}
+
+// --- World Effects --- //
+dispatch minecraft:resource[dragonsurvival:projectile_world_effect] to struct ProjectileWorldEffect {
+    world_effect: ProjectileWorldEffectType,
+    ...dragonsurvival:projectile_entity_effect[[entity_effect]],
+    ...dragonsurvival:projectile_block_effect[[block_effect]],
+    ...dragonsurvival:projectile_world_effect[[world_effect]],
+}
+
+enum(string) ProjectileWorldEffectType {
+    Explosion       = "dragonsurvival:explosion",
+    Lightning       = "dragonsurvival:lightning",
+    Particle        = "dragonsurvival:particle",
+    Run_Function    = "dragonsurvival:run_function",
+}
+
+// ----- # ----- //
+dispatch dragonsurvival:projectile_world_effect[dragonsurvival:explosion] to struct ProjectileExplosionEffect {
+    damage_type: #[id="damage_type"] string,
+    explosion_power: LevelBasedValue,
+    /// Whether it creates fire
+    fire: boolean,
+    /// Whether it breaks blocks
+    break_blocks: boolean,
+    /// Whether it can damage the caster
+    can_damage_self: boolean,
+}
+
+// ----- # ----- //
+dispatch dragonsurvival:projectile_world_effect[dragonsurvival:lightning] to struct ProjectileLightningWorldEffect {
+    /// Lightning data
+    data: LightningHandler,
+}
+
+// ----- # ----- //
+dispatch dragonsurvival:projectile_world_effect[dragonsurvival:particle] to struct ProjectileWorldParticleEffect {
+    particle_data: SpawnParticlesEntityEffect, // We have a custom object but the CODEC looks the same
+    particle_count: LevelBasedValue,
+}
+
+// ----- # ----- //
+dispatch dragonsurvival:projectile_world_effect[dragonsurvival:run_function] to struct ProjectileWorldRunFunctionEffect {
+    /// Minecraft function
+    function: #[id="function"] string,
+}
+
+// --- Block Effects --- //
+dispatch minecraft:resource[dragonsurvival:projectile_block_effect] to struct ProjectileBlockEffect {
+    block_effect: ProjectileBlockEffectType,
+    ...dragonsurvival:projectile_entity_effect[[entity_effect]],
+    ...dragonsurvival:projectile_block_effect[[block_effect]],
+    ...dragonsurvival:projectile_world_effect[[world_effect]],
+}
+
+enum(string) ProjectileBlockEffectType {
+    Particle        = "dragonsurvival:particle",
+    Run_Function    = "dragonsurvival:run_function",
+    Area_Cloud      = "dragonsurvival:area_cloud",
+}
+
+// ----- # ----- //
+dispatch dragonsurvival:projectile_block_effect[dragonsurvival:particle] to struct ProjectileBlockParticleEffect {
+    particle_data: SpawnParticlesEntityEffect, // We have a custom object but the CODEC looks the same
+    particle_count: LevelBasedValue,
+}
+
+// ----- # ----- //
+dispatch dragonsurvival:projectile_block_effect[dragonsurvival:run_function] to struct ProjectileBlockRunFunctionEffect {
+    function: #[id="function"] string,
+}
+
+// ----- # ----- //
+dispatch dragonsurvival:projectile_block_effect[dragonsurvival:area_cloud] to struct ProjectileAreaCloudEffect {
+    /// Potion effects applied by the cloud
+    potion: PotionData,
+    /// Duration of the cloud
+    duration: LevelBasedValue,
+    /// Probability of the cloud being created
+    /// 0 (0%) to 1 (100%)
+    probability: double @ 0..1,
+    /// Delay before the cloud takes effect
+    delay?: LevelBasedValue,
+    /// Radius of the cloud
+    radius?: LevelBasedValue,
+    /// Particle effect
+    particle: Particle
+}
+
+// --- Entity Effects --- //
+dispatch minecraft:resource[dragonsurvival:projectile_entity_effect] to struct ProjectileEntityEffect {
+    entity_effect: ProjectileEntityEffectType,
+    ...dragonsurvival:projectile_entity_effect[[entity_effect]],
+    ...dragonsurvival:projectile_block_effect[[block_effect]],
+    ...dragonsurvival:projectile_world_effect[[world_effect]],
+}
+
+enum(string) ProjectileEntityEffectType {
+    Damage          = "dragonsurvival:damage",
+    Potion          = "dragonsurvival:potion",
+    Lightning       = "dragonsurvival:lightning",
+    Particle        = "dragonsurvival:particle",
+    Run_Function    = "dragonsurvival:run_function",
+    Push            = "dragonsurvival:push",
+}
+
+// ----- # ----- //
+dispatch dragonsurvival:projectile_entity_effect[dragonsurvival:damage] to struct ProjectileDamageEffect {
+    damage_type: #[id="damage_type"] string,
+    amount: LevelBasedValue,
+}
+
+// ----- # ----- //
+dispatch dragonsurvival:projectile_entity_effect[dragonsurvival:potion] to struct ProjectilePotionEffect {
+    potion: PotionData,
+}
+
+struct PotionData {
+    /// List of effects
+    effects: (
+        #[id(registry="mob_effect", tags="allowed")] string |
+        [#[id="mob_effect"] string] |
+    ),
+    /// Effect level (0 = level 1, 1 = level 2, ...)
+    amplifier: LevelBasedValue,
+    /// Effect duration (in ticks)
+    duration: LevelBasedValue,
+    /// Probability of the effect being applied
+    /// 0 (0%) to 1 (100%)
+    /// (Default: 1)
+    probability?: LevelBasedValue,
+    /// Whether to show particle effects
+    /// (Default: false)
+    effect_particles?: boolean,
+    /// Whether to show the icon in the HUD
+    /// (Default: true)
+    show_icon?: boolean
+}
+
+// ----- # ----- //
+dispatch dragonsurvival:projectile_entity_effect[dragonsurvival:lightning] to struct ProjectileLightningEntityEffect {
+    data: LightningHandler,
+}
+
+struct LightningHandler {
+    /// Whether it can hurt the caster
+    can_hurt_self: boolean,
+    /// Whether it creates fire
+    spawns_fire: boolean,
+    /// Whether it ignores items and experience orbs
+    ignores_items_and_experience: boolean,
+}
+
+// ----- # ----- //
+dispatch dragonsurvival:projectile_entity_effect[dragonsurvival:particle] to struct ProjectileEntityParticleEffect {
+    particle_data: SpawnParticlesEntityEffect, // Custom object, but CODEC looks the same
+    particle_count: LevelBasedValue,
+}
+
+// ----- # ----- //
+dispatch dragonsurvival:projectile_entity_effect[dragonsurvival:run_function] to struct ProjectileEntityRunFunctionEffect {
+    function: #[id="function"] string,
+}
+
+// ----- # ----- //
+
+dispatch dragonsurvival:projectile_entity_effect[dragonsurvival:push] to struct ProjectileEntityPushEffect {
+    /// Direction to apply the push force
+    target_direction: struct {
+        direction: (
+            CustomDirection |
+            Direction
+        )
+    },
+    /// Push force (can be negative)
+    push_force: LevelBasedValue,
+}
+
+enum(string) CustomDirection {
+    Towards_Entity = "towards_entity",
+    Looking_At = "looking_at"
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+struct GenericArrowData {
+    /// Texture data
+    texture: LevelBasedResource,
+    /// Number of entities the arrow can pierce
+    /// This value will be copied to the corresponding NBT
+    piercing_level?: LevelBasedValue,
+}
+
+struct GenericBallData {
+    /// Texture data
+    /// Empty or invalid data may cause a crash
+    resources: LevelBasedResource,
+    /// Basic behavior data
+    behaviour_data: BehaviourData,
+    /// Effects executed when the entity is destroyed
+    on_destroy_effects?: [ProjectileTargeting],
+    /// Trail particle
+    trail_particle?: Particle,
+}
+
+// ----- # ----- //
+struct BehaviourData {
+    /// Collision box width
+    width: LevelBasedValue,
+    /// Collision box height
+    height: LevelBasedValue,
+    /// Maximum number of bounces (after reaching the limit, it will attempt to linger)
+    max_bounces?: LevelBasedValue,
+    /// Maximum lingering time after collision (in ticks)
+    max_lingering_ticks?: LevelBasedValue,
+    /// Maximum movement distance
+    max_movement_distance: LevelBasedValue,
+    /// Maximum lifespan (in ticks)
+    max_lifespan: LevelBasedValue,
+}
+
+// ----- # ----- //
+struct LevelBasedResource {
+    /// Texture entries based on level
+    /// Empty or invalid data may cause a crash
+    texture_entries: [ResourceLocation] @ 1..,
+}
+
+// ----- # ----- //
+struct ResourceLocation {
+    /// Starting level for this texture entry
+    /// (Defines a step function; each entry applies from its `from_level` until the next entry)
+    from_level: int @ -1..,
+    /// Texture resource for the projectile at this level
+    /// (Must be located in `assets/<namespace>/textures/entity/projectiles`)
+    /// (The `textures/entity/projectiles/` path and `.png` extension must be omitted)
+    texture_resource: #[id(registry="texture", path="entity/projectiles/")] string,
+}

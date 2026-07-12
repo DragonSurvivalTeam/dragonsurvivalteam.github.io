@@ -931,6 +931,13 @@
       "tags": ["partners"],
       "dependency": "dragonsurvival/predicates",
       "minVersion": "1.21.1"
+    },
+    {
+      "id": "dragonsurvival:projectile_data",
+      "url": "dragonsurvival/projectile_data",
+      "tags": ["partners"],
+      "dependency": "dragonsurvival/projectile_data",
+      "minVersion": "1.21.1"
     }
   ],
   "legacyGuides": [
