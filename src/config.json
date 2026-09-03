@@ -1079,77 +1079,91 @@
       "url": "dragonsurvival/dragon_stage",
       "tags": ["partners"],
       "dependency": "dragonsurvival/dragon_stage",
-      "minVersion": "1.20"
+      "versions": ["1.20", "1.21", "26.1"]
     },
     {
       "id": "dragonsurvival:dragon_body",
       "url": "dragonsurvival/dragon_body",
       "tags": ["partners"],
       "dependency": "dragonsurvival/dragon_body",
-      "minVersion": "1.21.1"
+      "versions": ["1.20", "1.21", "26.1"]
     },
     {
       "id": "dragonsurvival:dragon_species",
       "url": "dragonsurvival/dragon_species",
       "tags": ["partners"],
       "dependency": "dragonsurvival/dragon_species",
-      "minVersion": "1.21.1"
+      "versions": ["1.20", "1.21", "26.1"]
     },
     {
       "id": "dragonsurvival:dragon_ability",
       "url": "dragonsurvival/dragon_ability",
       "tags": ["partners"],
       "dependency": "dragonsurvival/dragon_ability",
-      "minVersion": "1.21.1"
+      "versions": ["1.20", "1.21", "26.1"]
     },
     {
       "id": "dragonsurvival:dragon_penalty",
       "url": "dragonsurvival/dragon_penalty",
       "tags": ["partners"],
       "dependency": "dragonsurvival/dragon_penalty",
-      "minVersion": "1.21.1"
+      "versions": ["1.20", "1.21", "26.1"]
+    },
+    {
+      "id": "dragonsurvival:dragon_emote_set",
+      "url": "dragonsurvival/dragon_emote_set",
+      "tags": ["partners"],
+      "dependency": "dragonsurvival/dragon_emote_set",
+      "versions": ["1.20", "1.21", "26.1"]
+    },
+    {
+      "id": "dragonsurvival:projectile_data",
+      "url": "dragonsurvival/projectile_data",
+      "tags": ["partners"],
+      "dependency": "dragonsurvival/projectile_data",
+      "versions": ["1.20", "1.21", "26.1"]
     },
     {
       "id": "dragonsurvival:data_map_diet_entries",
       "url": "dragonsurvival/data_map-diet_entries",
       "tags": ["partners"],
       "dependency": "dragonsurvival/data_maps",
-      "minVersion": "1.21.1"
+      "versions": ["1.20", "1.21", "26.1"]
     },
     {
       "id": "dragonsurvival:data_map_stage_resources",
       "url": "dragonsurvival/data_map-stage_resources",
       "tags": ["partners"],
       "dependency": "dragonsurvival/data_maps",
-      "minVersion": "1.21.1"
+      "versions": ["1.20", "1.21", "26.1"]
     },
     {
       "id": "dragonsurvival:data_map_end_platforms",
       "url": "dragonsurvival/data_map-end_platforms",
       "tags": ["partners"],
       "dependency": "dragonsurvival/data_maps",
-      "minVersion": "1.21.1"
+      "versions": ["1.20", "1.21", "26.1"]
     },
     {
       "id": "dragonsurvival:data_map_dragon_beacon_data",
       "url": "dragonsurvival/data_map-dragon_beacon_data",
       "tags": ["partners"],
       "dependency": "dragonsurvival/data_maps",
-      "minVersion": "1.21.1"
+      "versions": ["1.20", "1.21", "26.1"]
     },
     {
       "id": "dragonsurvival:data_map_body_icons",
       "url": "dragonsurvival/data_map-body_icons",
       "tags": ["partners"],
       "dependency": "dragonsurvival/data_maps",
-      "minVersion": "1.21.1"
+      "versions": ["1.20", "1.21", "26.1"]
     },
     {
       "id": "dragonsurvival:predicates",
       "url": "dragonsurvival/predicates",
       "tags": ["partners"],
       "dependency": "dragonsurvival/predicates",
-      "minVersion": "1.21.1"
+      "versions": ["1.20", "1.21", "26.1"]
     },
     {
       "id": "lychee:recipe",

@@ -12,6 +12,10 @@ import { checkVersion } from './services/index.js'
 
 export const SOURCE_REPO_URL = 'https://github.com/dragonsurvivalteam/dragonsurvivalteam.github.io'
 
+export function generatorSupportsVersion(gen: ConfigGenerator, version: VersionId) {
+	return gen.versions?.includes(version) ?? checkVersion(version, gen.minVersion, gen.maxVersion)
+}
+
 export function isPromise(obj: any): obj is Promise<any> {
 	return typeof (obj as any)?.then === 'function' 
 }

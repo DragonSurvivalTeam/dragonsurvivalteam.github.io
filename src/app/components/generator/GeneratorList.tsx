@@ -2,7 +2,7 @@ import { useMemo, useState } from 'preact/hooks'
 import type { ConfigGenerator } from '../../Config.js'
 import config from '../../Config.js'
 import { useLocale, useVersion } from '../../contexts/index.js'
-import { checkVersion } from '../../services/Versions.js'
+import { generatorSupportsVersion } from '../../Utils.js'
 import { GeneratorCard, TextInput, VersionSwitcher } from '../index.js'
 
 interface Props {
@@ -22,7 +22,7 @@ export function GeneratorList({ predicate , compare }: Props) {
 		return config.generators.filter(gen => {
 			if (predicate === undefined || !predicate(gen)) return false
 			if (versionFilter === false) return true
-			return checkVersion(version, gen.minVersion, gen.maxVersion)
+			return generatorSupportsVersion(gen, version)
 		})
 	}, [version, versionFilter])
 

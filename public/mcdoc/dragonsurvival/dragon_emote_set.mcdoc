@@ -1,0 +1,25 @@
+dispatch minecraft:resource[dragonsurvival:dragon_emote_set] to struct DragonEmoteSet {
+    emotes: [DragonEmoteDefinition]
+}
+
+struct DragonEmoteDefinition {
+    animation_key: string,
+    translation_override?: string,
+    speed?: double,
+    /// Defaults to an infinite duration.
+    duration?: int,
+    loops?: boolean,
+    blend?: boolean,
+    locks_head?: boolean,
+    locks_tail?: boolean,
+    third_person?: boolean,
+    can_move?: boolean,
+    sound?: DragonEmoteSound
+}
+
+struct DragonEmoteSound {
+    sound_event: #[id="sound_event"] string,
+    volume?: float @ 0..,
+    pitch?: float @ 0..,
+    interval: int
+}

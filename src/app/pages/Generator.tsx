@@ -5,8 +5,7 @@ import { ErrorPanel, Octicon } from '../components/index.js'
 import config from '../Config.js'
 import { useLocale, useTitle, useVersion } from '../contexts/index.js'
 import type { VersionId } from '../services/index.js'
-import { checkVersion } from '../services/index.js'
-import { getGenerator } from '../Utils.js'
+import { generatorSupportsVersion, getGenerator } from '../Utils.js'
 
 export const SHARE_KEY = 'share'
 
@@ -24,16 +23,21 @@ export function Generator({}: Props) {
 
 	const allowedVersions = useMemo(() => {
 		return config.versions
-			.filter(v => checkVersion(v.id, gen.minVersion, gen.maxVersion))
+			.filter(v => generatorSupportsVersion(gen, v.id as VersionId))
 			.map(v => v.id as VersionId)
 			.reverse()
-	}, [gen.minVersion, gen.maxVersion])
+	}, [gen])
 
 	useTitle(locale('title.generator', locale(`generator.${gen.id}`)), allowedVersions)
 
-	if (!checkVersion(version, gen.minVersion, gen.maxVersion)) {
-		const lower = !checkVersion(version, gen.minVersion)
-		const proposedVersion = (lower ? gen.minVersion : gen.maxVersion) as VersionId
+	if (!generatorSupportsVersion(gen, version)) {
+		const currentIndex = config.versions.findIndex(v => v.id === version)
+		const proposedVersion = allowedVersions.reduce((nearest, candidate) => {
+			const candidateIndex = config.versions.findIndex(v => v.id === candidate)
+			const nearestIndex = config.versions.findIndex(v => v.id === nearest)
+			return Math.abs(candidateIndex - currentIndex) < Math.abs(nearestIndex - currentIndex) ? candidate : nearest
+		}, allowedVersions[0])
+		const lower = config.versions.findIndex(v => v.id === proposedVersion) > currentIndex
 		return <main>
 			<ErrorPanel error={locale(`generator.error_${lower ? 'min' : 'max'}_version`, proposedVersion)} reportable={false}>
 				<div class="error-actions">

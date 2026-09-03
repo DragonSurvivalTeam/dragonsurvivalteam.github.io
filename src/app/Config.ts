@@ -27,6 +27,7 @@ export interface ConfigGenerator {
 	dependency?: string,
 	minVersion?: string,
 	maxVersion?: string,
+	versions?: VersionId[],
 	wiki?: string,
 }
 
