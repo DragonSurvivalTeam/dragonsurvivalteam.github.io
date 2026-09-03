@@ -282,7 +282,7 @@ export class Deepslate {
 			this.settingsCache = settings.noise
 			const randomState = new this.d.RandomState(settings, seed)
 			return randomState.router.finalDensity
-		} else {
+		} else if (this.isVersion('1.18.2')) {
 			const random = this.d.XoroshiroRandom.create(seed).forkPositional()
 			const settings = this.d.NoiseSettings.fromJson({
 				min_y: minY,
@@ -297,6 +297,8 @@ export class Deepslate {
 			this.settingsCache = settings
 			const originalFn = this.d.DensityFunction.fromJson(state)
 			return originalFn.mapAll(new (this.d.NoiseRouter as any).Visitor(random, settings))
+		} else {
+			return undefined
 		}
 	}
 

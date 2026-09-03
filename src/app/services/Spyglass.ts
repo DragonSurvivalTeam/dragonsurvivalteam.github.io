@@ -1,6 +1,7 @@
 import * as core from '@spyglassmc/core'
 import { BrowserExternals } from '@spyglassmc/core/lib/browser.js'
 import * as je from '@spyglassmc/java-edition'
+import type { McmetaSummary } from '@spyglassmc/java-edition/lib/dependency/index.js'
 import { ReleaseVersion } from '@spyglassmc/java-edition/lib/dependency/index.js'
 import * as json from '@spyglassmc/json'
 import { localize } from '@spyglassmc/locales'
@@ -256,6 +257,9 @@ export class SpyglassService {
 		if (gen.id === 'pack_mcmeta') {
 			return `${UNSAVED_URI}pack.mcmeta`
 		}
+		if (gen.id === 'sounds') {
+			return `${UNSAVED_URI}assets/minecraft/sounds.json`
+		}
 		const pack = gen.tags?.includes('assets') ? 'assets' : 'data'
 		return `${UNSAVED_URI}${pack}/draft/${genPath(gen, this.version)}/draft${gen.ext ?? '.json'}`
 	}
@@ -309,6 +313,49 @@ export class SpyglassService {
 							},
 							world: {
 								category: 'world',
+							},
+							// Temporary until spyglass core is updated
+							cat_sound_variant : {
+								category: 'cat_sound_variant',
+							},
+							chicken_sound_variant : {
+								category: 'chicken_sound_variant',
+							},
+							context_float_provider : {
+								category: 'context_float_provider',
+							},
+							context_int_provider : {
+								category: 'context_int_provider',
+							},
+							cow_sound_variant : {
+								category: 'cow_sound_variant',
+							},
+							pig_sound_variant : {
+								category: 'pig_sound_variant',
+							},
+							sulfur_cube_archetype : {
+								category: 'sulfur_cube_archetype',
+							},
+							slot_source : {
+								category: 'slot_source',
+							},
+							decorated_pot_pattern : {
+								category: 'decorated_pot_pattern',
+							},
+							block_transformer: {
+								category: 'block_transformer',
+							},
+							'worldgen/carver' : {
+								category: 'worldgen/carver',
+							},
+							'worldgen/feature' : {
+								category: 'worldgen/feature',
+							},
+							'worldgen/material_condition' : {
+								category: 'worldgen/material_condition',
+							},
+							'worldgen/material_rule' : {
+								category: 'worldgen/material_rule',
 							},
 							// Partner resources
 							...Object.fromEntries(siteConfig.generators.filter(gen => gen.dependency).map(gen =>
@@ -404,7 +451,7 @@ const initialize: core.ProjectInitializer = async (ctx) => {
 
 	meta.registerSymbolRegistrar('mcmeta-summary', {
 		checksum: versionChecksum,
-		registrar: je.dependency.symbolRegistrar(summary, release),
+		registrar: customSymbolRegistrar(summary, release),
 	})
 
 	registerAttributes(meta, release, versions)
@@ -420,20 +467,12 @@ const initialize: core.ProjectInitializer = async (ctx) => {
 // Duplicate these from spyglass for now, until they are exported separately
 function registerAttributes(meta: core.MetaRegistry, release: ReleaseVersion, versions: VersionMeta[]) {
 	mcdoc.runtime.registerAttribute(meta, 'since', mcdoc.runtime.attribute.validator.string, {
-		filterElement: (config, ctx) => {
-			if (!config.startsWith('1.')) {
-				ctx.logger.warn(`Invalid mcdoc attribute for "since": ${config}`)
-				return true
-			}
+		filterElement: (config, _) => {
 			return ReleaseVersion.cmp(release, config as ReleaseVersion) >= 0
 		},
 	})
 	mcdoc.runtime.registerAttribute(meta, 'until', mcdoc.runtime.attribute.validator.string, {
-		filterElement: (config, ctx) => {
-			if (!config.startsWith('1.')) {
-				ctx.logger.warn(`Invalid mcdoc attribute for "until": ${config}`)
-				return true
-			}
+		filterElement: (config, _) => {
 			return ReleaseVersion.cmp(release, config as ReleaseVersion) < 0
 		},
 	})
@@ -442,13 +481,9 @@ function registerAttributes(meta: core.MetaRegistry, release: ReleaseVersion, ve
 		'deprecated',
 		mcdoc.runtime.attribute.validator.optional(mcdoc.runtime.attribute.validator.string),
 		{
-			mapField: (config, field, ctx) => {
+			mapField: (config, field, _) => {
 				if (config === undefined) {
 					return { ...field, deprecated: true }
-				}
-				if (!config.startsWith('1.')) {
-					ctx.logger.warn(`Invalid mcdoc attribute for "deprecated": ${config}`)
-					return field
 				}
 				if (ReleaseVersion.cmp(release, config as ReleaseVersion) >= 0) {
 					return { ...field, deprecated: true }
@@ -475,6 +510,24 @@ function registerAttributes(meta: core.MetaRegistry, release: ReleaseVersion, ve
 			}
 		},
 	})
+}
+
+const McmetaSummaryUri = 'mcmeta://summary/registries.json'
+
+function customSymbolRegistrar(summary: McmetaSummary, release: ReleaseVersion): core.SymbolRegistrar {
+	return (symbols, ctx) => {
+		je.dependency.symbolRegistrar(summary, release)(symbols, ctx)
+
+		// Temporary until spyglass core is updated
+		for (const [registryId, registry] of Object.entries(summary.registries)) {
+			if (['context_float_provider', 'context_float_provider_type', 'context_int_provider', 'context_int_provider_type', 'worldgen/carver_type', 'worldgen/feature_type', 'worldgen/material_condition_type', 'worldgen/material_rule_type'].includes(registryId)) {
+				for (const entryId of registry) {
+					symbols.query(McmetaSummaryUri, registryId, core.ResourceLocation.lengthen(entryId))
+						.enter({ usage: { type: 'declaration' } })
+				}
+			}
+		}
+	}
 }
 
 const VanillaMcdocUri = 'mcdoc://vanilla-mcdoc/symbols.json'

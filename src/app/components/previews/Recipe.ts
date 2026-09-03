@@ -49,6 +49,35 @@ export function placeItems(version: VersionId, recipe: any, animation: number, i
 			const choice = materials[animation % materials.length]
 			items.set('crafting.1', choice)
 		}
+	} else if (type === 'crafting_dye') {
+		const target = allIngredientChoices(version, recipe.target, itemTags)
+		if (target.length > 0) {
+			const choice = target[animation % target.length]
+			items.set('crafting.0', choice)
+		}
+		const dye = allIngredientChoices(version, recipe.dye, itemTags)
+		if (dye.length > 0) {
+			const choice = dye[animation % dye.length]
+			items.set('crafting.1', choice)
+		}
+	} else if (type === 'crafting_imbue') {
+		const source = allIngredientChoices(version, recipe.source, itemTags)
+		if (source.length > 0) {
+			const choice = source[animation % source.length]
+			items.set('crafting.4', choice)
+		}
+		const material = allIngredientChoices(version, recipe.material, itemTags)
+		if (material.length > 0) {
+			const choice = material[animation % material.length]
+			items.set('crafting.0', choice)
+			items.set('crafting.1', choice)
+			items.set('crafting.2', choice)
+			items.set('crafting.3', choice)
+			items.set('crafting.5', choice)
+			items.set('crafting.6', choice)
+			items.set('crafting.7', choice)
+			items.set('crafting.8', choice)
+		}
 	} else if (type === 'smelting' || type === 'smoking' || type === 'blasting' || type === 'campfire_cooking') {
 		const choices = allIngredientChoices(version, recipe.ingredient, itemTags)
 		if (choices.length > 0) {

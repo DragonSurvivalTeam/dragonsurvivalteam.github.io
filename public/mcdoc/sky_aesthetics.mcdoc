@@ -13,14 +13,14 @@ dispatch minecraft:resource[sky_aesthetics:sky] to struct SkyProperties {
     sky_type: SkyType,
     sky_color: struct {
         custom_color: boolean,
-
-        /// The R, G, B and alpha value for the color
-        #[until="1.21.2"]
-        color: [float] @ 4,
-        /// The R, G and B value for the color
-        #[since="1.21.3"]
-        color: [float] @ 3 ,
-
+        #[until="1.21.2"] ...struct {
+            /// The R, G, B and alpha value for the color
+            color: [float] @ 4,
+        },
+        #[since="1.21.3"] ...struct {
+            /// The R, G and B value for the color
+            color: [float] @ 3,
+        }
     },
     sky_objects: [SkyObject],
     constellations: [string],
