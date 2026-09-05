@@ -440,14 +440,14 @@ const initialize: core.ProjectInitializer = async (ctx) => {
 	}
 
 	const summary: je.dependency.McmetaSummary = {
-		registries: Object.fromEntries((await fetchRegistries(version.id)).entries()),
-		blocks: Object.fromEntries([...(await fetchBlockStates(version.id)).entries()]
+		registries: Object.fromEntries((await fetchRegistries(version.id as VersionId)).entries()),
+		blocks: Object.fromEntries([...(await fetchBlockStates(version.id as VersionId)).entries()]
 			.map(([id, data]) => [id, data])),
 		fluids: je.dependency.Fluids,
 		commands: { type: 'root', children: {} },
 	}
 
-	const versionChecksum = getVersionChecksum(version.id)
+	const versionChecksum = getVersionChecksum(version.id as VersionId)
 
 	meta.registerSymbolRegistrar('mcmeta-summary', {
 		checksum: versionChecksum,

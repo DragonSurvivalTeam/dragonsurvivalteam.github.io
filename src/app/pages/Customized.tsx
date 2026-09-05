@@ -5,7 +5,7 @@ import config from '../Config.js'
 import { useLocale, useTitle, useVersion } from '../contexts/index.js'
 import { useSearchParam } from '../hooks/index.js'
 import type { VersionId } from '../services/Versions.js'
-import { checkVersion } from '../services/Versions.js'
+import { checkVersion, VersionIds } from '../services/Versions.js'
 
 const MIN_VERSION = '1.20'
 const Tabs = ['basic', 'biomes', 'structures', 'ores']
@@ -26,6 +26,7 @@ export function Customized({}: Props) {
 
 	const allowedVersions = useMemo(() => {
 		return config.versions
+			.filter(v => VersionIds.includes(v.id as VersionId))
 			.filter(v => checkVersion(v.id, MIN_VERSION))
 			.map(v => v.id as VersionId)
 			.reverse()

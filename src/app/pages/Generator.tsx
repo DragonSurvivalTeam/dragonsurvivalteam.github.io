@@ -5,6 +5,7 @@ import { ErrorPanel, Octicon } from '../components/index.js'
 import config from '../Config.js'
 import { useLocale, useTitle, useVersion } from '../contexts/index.js'
 import type { VersionId } from '../services/index.js'
+import { VersionIds } from '../services/index.js'
 import { generatorSupportsVersion, getGenerator } from '../Utils.js'
 
 export const SHARE_KEY = 'share'
@@ -23,6 +24,7 @@ export function Generator({}: Props) {
 
 	const allowedVersions = useMemo(() => {
 		return config.versions
+			.filter(v => VersionIds.includes(v.id as VersionId))
 			.filter(v => generatorSupportsVersion(gen, v.id as VersionId))
 			.map(v => v.id as VersionId)
 			.reverse()

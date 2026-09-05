@@ -2,6 +2,7 @@ import { useMemo, useState } from 'preact/hooks'
 import config from '../Config.js'
 import { useLocale } from '../contexts/index.js'
 import type { VersionId } from '../services/index.js'
+import { VersionIds } from '../services/index.js'
 import { Store } from '../Store.js'
 import { Btn } from './Btn.js'
 import { BtnMenu } from './BtnMenu.js'
@@ -24,7 +25,9 @@ export function VersionSwitcher({ value, allowed, hasAny, onChange, onAny }: Pro
 				.map(a => config.versions.find(v => v.id === a)!)
 				.filter(v => v !== undefined)
 		}
-		return [...config.versions].reverse()
+		return VersionIds
+			.map(id => config.versions.find(v => v.id === id)!)
+			.reverse()
 	}, [allowed])
 
 	const hasMoreVersions = useMemo(() => {
@@ -38,7 +41,7 @@ export function VersionSwitcher({ value, allowed, hasAny, onChange, onAny }: Pro
 	return <BtnMenu class={`version-switcher${Store.getVersion() === null ? ' attention' : ''}`} icon="tag" label={value ?? locale('any_version')} tooltip={locale('switch_version')}>
 		{hasAny && <Btn label={locale('any_version')} onClick={onAny} active={!value} />}
 		{shownVersions.map(v => 
-			<Btn label={v.name} active={v.id === value} onClick={() => onChange(v.id)} />)}
+			<Btn label={v.name} active={v.id === value} onClick={() => onChange(v.id as VersionId)} />)}
 		{!showMore && hasMoreVersions && <Btn icon="chevron_down" label="More" onClick={e => {setShowMore(true);e.stopPropagation()}} />}
 	</BtnMenu>
 }

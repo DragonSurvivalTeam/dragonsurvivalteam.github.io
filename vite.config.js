@@ -7,6 +7,7 @@ const config = require('./src/config.json')
 const English = require('./src/locales/en.json')
 
 const convertFormats = ['give-command', 'loot-table', 'item-modifier', 'recipe-output']
+const supportedVersions = ['1.20', '1.21', '26.1']
 
 export default defineConfig({
 	server: {
@@ -80,6 +81,7 @@ function getVersions(m) {
 	const maxVersion = config.versions.findIndex(v => m?.maxVersion === v.id)
 	const versions = config.versions
 		.filter((_, i) => minVersion <= i && (maxVersion === -1 || i <= maxVersion))
+		.filter(v => supportedVersions.includes(v.id))
 		.map(v => v.id)
 		.filter((v, _, arr) => v.length === 4 || arr.length <= 3)
 		.slice(-3)

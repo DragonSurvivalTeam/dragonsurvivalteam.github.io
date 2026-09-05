@@ -1,5 +1,5 @@
 import config from '../config.json'
-import type { VersionId } from './services/Versions.js'
+import type { KnownVersionId, VersionId } from './services/Versions.js'
 
 export interface ConfigLanguage {
 	code: string,
@@ -8,7 +8,7 @@ export interface ConfigLanguage {
 }
 
 export interface ConfigVersion {
-	id: VersionId,
+	id: KnownVersionId,
 	pack_format: number,
 	name: string,
 	ref?: string,

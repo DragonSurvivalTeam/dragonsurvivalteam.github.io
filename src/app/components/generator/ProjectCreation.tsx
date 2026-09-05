@@ -4,7 +4,7 @@ import { useLocale, useProject } from '../../contexts/index.js'
 import { useModal } from '../../contexts/Modal.jsx'
 import { useSpyglass } from '../../contexts/Spyglass.jsx'
 import type { VersionId } from '../../services/index.js'
-import { DEFAULT_VERSION } from '../../services/index.js'
+import { DEFAULT_VERSION, VersionIds } from '../../services/index.js'
 import { PROJECTS_URI } from '../../services/Spyglass.js'
 import { hexId, message, readZip } from '../../Utils.js'
 import { Btn, BtnMenu, FileUpload, Octicon, TextInput } from '../index.js'
@@ -64,7 +64,10 @@ export function ProjectCreation() {
 		return !(namespace.length === 0 || namespace.match(/^(?:[a-z0-9._-]+:)?[a-z0-9/._-]+$/))
 	}, [namespace])
 
-	const versions = config.versions.map(v => v.id as VersionId).reverse()
+	const versions = config.versions
+		.filter(v => VersionIds.includes(v.id as VersionId))
+		.map(v => v.id as VersionId)
+		.reverse()
 
 	return <Modal class="project-creation">
 		<p>{locale('project.create')}</p>

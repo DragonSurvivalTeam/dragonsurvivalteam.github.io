@@ -3,6 +3,7 @@ import type { ConfigGenerator } from '../../Config.js'
 import config from '../../Config.js'
 import { useLocale } from '../../contexts/Locale.jsx'
 import type { VersionId } from '../../services/Versions.js'
+import { VersionIds } from '../../services/Versions.js'
 import { cleanUrl, generatorSupportsVersion } from '../../Utils.js'
 import { Badge, Card, Icons, ToolCard } from '../index.js'
 
@@ -34,6 +35,7 @@ export function GeneratorCard({ id, minimal }: Props) {
 	const versions = useMemo(() => {
 		if (!gen) return []
 		return config.versions
+			.filter(v => VersionIds.includes(v.id as VersionId))
 			.filter(v => generatorSupportsVersion(gen, v.id as VersionId))
 			.map(v => v.id as VersionId)
 	}, [gen])

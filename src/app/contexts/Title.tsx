@@ -3,6 +3,7 @@ import { createContext } from 'preact'
 import { useCallback, useContext, useEffect, useState } from 'preact/hooks'
 import config from '../Config.js'
 import type { VersionId } from '../services/index.js'
+import { VersionIds } from '../services/index.js'
 import { useLocale } from './index.js'
 
 const VERSIONS_IN_TITLE = 3
@@ -31,7 +32,7 @@ export function TitleProvider({ children }: { children: ComponentChildren }) {
 	const [title, setTitle] = useState<string>(locale('title.home'))
 
 	const changeTitle = useCallback((title: string, versionIds?: VersionId[], suffix?: string) => {
-		let versions = config.versions
+		let versions = config.versions.filter(v => VersionIds.includes(v.id as VersionId))
 		if (versionIds !== undefined) {
 			versions = config.versions.filter(v => versionIds?.includes(v.id as VersionId))
 		}

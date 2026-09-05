@@ -380,7 +380,7 @@ export class Deepslate {
 		return chunk?.getBlockState(this.d.BlockPos.create(x, y, this.Z))
 	}
 
-	private isVersion(min?: VersionId, max?: VersionId) {
+	private isVersion(min?: string, max?: string) {
 		if (!this.loadedVersion) {
 			throw new Error('No deepslate version loaded')
 		}

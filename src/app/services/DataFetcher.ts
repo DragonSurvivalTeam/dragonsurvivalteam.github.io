@@ -1,7 +1,7 @@
 import config from '../Config.js'
 import { Store } from '../Store.js'
 import { message } from '../Utils.js'
-import type { VersionId } from './Versions.js'
+import type { KnownVersionId, VersionId } from './Versions.js'
 import { checkVersion } from './Versions.js'
 
 const CACHE_NAME = 'misode-v2'
@@ -150,7 +150,7 @@ export async function fetchPreset(versionId: VersionId, registry: string, id: st
 	}
 }
 
-export async function fetchAllPresets(versionId: VersionId, registry: string) {
+export async function fetchAllPresets(versionId: KnownVersionId, registry: string) {
 	console.debug(`[fetchAllPresets] ${versionId} ${registry}`)
 	const version = config.versions.find(v => v.id === versionId)!
 	await validateCache(version)
