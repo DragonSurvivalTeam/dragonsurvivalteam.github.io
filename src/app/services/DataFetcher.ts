@@ -1,7 +1,7 @@
 import config from '../Config.js'
 import { Store } from '../Store.js'
 import { message } from '../Utils.js'
-import type { VersionId } from './Versions.js'
+import type { KnownVersionId, VersionId } from './Versions.js'
 import { checkVersion } from './Versions.js'
 
 const CACHE_NAME = 'misode-v2'
@@ -14,7 +14,6 @@ const mcmetaUrl = 'https://raw.githubusercontent.com/misode/mcmeta'
 const mcmetaTarballUrl = 'https://github.com/misode/mcmeta/tarball'
 const vanillaMcdocUrl = 'https://raw.githubusercontent.com/SpyglassMC/vanilla-mcdoc'
 const changesUrl = 'https://raw.githubusercontent.com/misode/technical-changes'
-const fixesUrl = 'https://raw.githubusercontent.com/misode/mcfixes'
 const versionDiffUrl = 'https://mcmeta-diff.misode.workers.dev'
 const whatsNewUrl = 'https://whats-new.misode.workers.dev'
 
@@ -151,7 +150,7 @@ export async function fetchPreset(versionId: VersionId, registry: string, id: st
 	}
 }
 
-export async function fetchAllPresets(versionId: VersionId, registry: string) {
+export async function fetchAllPresets(versionId: KnownVersionId, registry: string) {
 	console.debug(`[fetchAllPresets] ${versionId} ${registry}`)
 	const version = config.versions.find(v => v.id === versionId)!
 	await validateCache(version)
@@ -306,31 +305,6 @@ export async function fetchChangelogs(): Promise<Change[]> {
 		return changes.map(c => ({ ...c, order: versionMap.get(c.version) ?? 0 }))
 	} catch (e) {
 		throw new Error(`Error occured while fetching technical changes: ${message(e)}`)
-	}
-}
-
-export interface Bugfix {
-	id: string,
-	summary: string,
-	labels: string[],
-	status: string,
-	confirmation_status: string,
-	categories: string[],
-	priority: string,
-	fix_versions: string[],
-	creation_date: string,
-	resolution_date: string,
-	updated_date: string,
-	watches: number,
-	votes: number,
-}
-
-export async function fetchBugfixes(version: string): Promise<Bugfix[]> {
-	try {
-		const fixes = await cachedFetch<Bugfix[]>(`${fixesUrl}/main/versions/${version}.json`, { refresh: true })
-		return fixes
-	} catch (e) {
-		throw new Error(`Error occured while fetching bugfixes for version ${version}: ${message(e)}`)
 	}
 }
 

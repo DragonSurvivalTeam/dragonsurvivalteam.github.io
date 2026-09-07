@@ -25,6 +25,8 @@ dispatch dragonsurvival:sub_predicate[dragonsurvival:dragon_predicate] to struct
         #[id(registry="dragonsurvival:dragon_body", tags="allowed")] string |
         [#[id="dragonsurvival:dragon_body"] string] |
     ),
+    /// Requires the listed abilities to have levels in the supplied ranges.
+    ability_levels?: [AbilityLevelPredicate],
     /// This flag is switched by growth items with a growth of 0
     is_growth_stopped?: boolean,
     /// This flag is set when an ender dragon dies and the player has damaged it beforehand
@@ -39,6 +41,11 @@ dispatch dragonsurvival:sub_predicate[dragonsurvival:dragon_predicate] to struct
     spin_was_granted?: boolean,
     /// Whether the dragon is flying or not
     is_flying?: boolean
+}
+
+struct AbilityLevelPredicate {
+    ability: #[id="dragonsurvival:dragon_ability"] string,
+    level: MinMaxBounds<int>
 }
 
 struct DragonStagePredicate {
@@ -122,7 +129,7 @@ struct NearbyEntityPredicate {
 
 struct LookingAtBlock {
     /// The block to check for
-    block_predicate: BlockPredicate,
+    predicate: BlockPredicate,
     /// The distance of the check
     distance: double
 }

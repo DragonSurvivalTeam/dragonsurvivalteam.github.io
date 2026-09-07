@@ -48,7 +48,7 @@ struct PotionData {
 
 struct DamageModification {
     base: DurationInstanceBase,
-    damage_types: (
+    damage_types?: (
         #[id(registry="damage_type", tags="allowed")] string |
         [#[id="damage_type"] string] |
     ),
@@ -134,12 +134,6 @@ struct Fear {
     /// Sprint movement speed modifier when the entity is running away (default: 1.3)
     /// This is used once you get too close to the entity
     sprint_speed?: LevelBasedValue
-}
-
-// ----- # ----- //
-
-dispatch dragonsurvival:penalty_effect[dragonsurvival:fear] to struct FearPenalty {
-    fears: [Fear]
 }
 
 // ----- # ----- //

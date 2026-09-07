@@ -1,13 +1,13 @@
 import preact from '@preact/preset-vite'
 import html from '@rollup/plugin-html'
 import { env } from 'process'
-import { visualizer } from 'rollup-plugin-visualizer'
 import { defineConfig } from 'vite'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 const config = require('./src/config.json')
 const English = require('./src/locales/en.json')
 
 const convertFormats = ['give-command', 'loot-table', 'item-modifier', 'recipe-output']
+const supportedVersions = ['1.20', '1.21', '26.1']
 
 export default defineConfig({
 	server: {
@@ -73,7 +73,6 @@ export default defineConfig({
 				{ src: 'src/styles/giscus-burn.css', dest: 'assets' },
 			],
 		}),
-		visualizer({ open: true }),
 	],
 })
 
@@ -82,6 +81,7 @@ function getVersions(m) {
 	const maxVersion = config.versions.findIndex(v => m?.maxVersion === v.id)
 	const versions = config.versions
 		.filter((_, i) => minVersion <= i && (maxVersion === -1 || i <= maxVersion))
+		.filter(v => supportedVersions.includes(v.id))
 		.map(v => v.id)
 		.filter((v, _, arr) => v.length === 4 || arr.length <= 3)
 		.slice(-3)

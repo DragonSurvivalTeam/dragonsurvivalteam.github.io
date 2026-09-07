@@ -1,0 +1,241 @@
+use ::java::data::advancement::predicate::EntityPredicate
+use ::java::data::enchantment::LevelBasedValue
+use ::java::data::loot::LootCondition
+use ::java::util::direction::Direction
+use ::java::util::particle::Particle
+
+dispatch minecraft:resource[dragonsurvival:projectile_data] to struct DragonProjectileData {
+    general_data: ProjectileGeneralData,
+    type_data: (ProjectileBallData | ProjectileArrowData)
+}
+
+struct ProjectileGeneralData {
+    name: #[id] string,
+    is_impact_projectile?: boolean,
+    entity_hit_condition?: LootCondition,
+    ticking_effects: [ProjectileTargeting],
+    common_hit_effects: [ProjectileTargeting],
+    entity_hit_effects: [ProjectileEntityEffect],
+    block_hit_effects: [ProjectileBlockEffect]
+}
+
+struct ProjectileArrowData {
+    texture: ProjectileLevelBasedResource,
+    piercing_level?: LevelBasedValue
+}
+
+struct ProjectileBallData {
+    resources: ProjectileLevelBasedResource,
+    trail_particle?: Particle,
+    on_destroy_effects?: [ProjectileTargeting],
+    behaviour_data: ProjectileBehaviourData
+}
+
+struct ProjectileLevelBasedResource {
+    texture_entries: [ProjectileLevelBasedResourceEntry]
+}
+
+struct ProjectileLevelBasedResourceEntry {
+    texture_resource: #[id] string,
+    from_level: int @ 0..255
+}
+
+struct ProjectileBehaviourData {
+    width: LevelBasedValue,
+    height: LevelBasedValue,
+    max_bounces?: LevelBasedValue,
+    max_lingering_ticks?: LevelBasedValue,
+    max_movement_distance: LevelBasedValue,
+    max_lifespan: LevelBasedValue
+}
+
+struct ProjectileTargeting {
+    target_type: #[id="dragonsurvival:projectile_targeting"] ProjectileTargetingType,
+    ...dragonsurvival:projectile_targeting[[target_type]]
+}
+
+enum(string) ProjectileTargetingType {
+    Area = "dragonsurvival:area",
+    Point = "dragonsurvival:point"
+}
+
+dispatch dragonsurvival:projectile_targeting[dragonsurvival:area] to struct ProjectileAreaTarget {
+    general_data: ProjectileTargetingData,
+    radius: LevelBasedValue,
+    particle_trail?: Particle
+}
+
+dispatch dragonsurvival:projectile_targeting[dragonsurvival:point] to struct ProjectilePointTarget {
+    general_data: ProjectileTargetingData
+}
+
+struct ProjectileTargetingData {
+    effects: [ConditionalProjectileEffect],
+    tick_rate?: int,
+    chance?: double @ 0..1
+}
+
+struct ConditionalProjectileEffect {
+    effect: (ProjectileBlockEffect | ProjectileEntityEffect | ProjectileWorldEffect),
+    condition?: LootCondition
+}
+
+struct ProjectileBlockEffect {
+    block_effect: #[id="dragonsurvival:projectile_block_effect"] ProjectileBlockEffectType,
+    ...dragonsurvival:projectile_block_effect[[block_effect]]
+}
+
+enum(string) ProjectileBlockEffectType {
+    Particle = "dragonsurvival:particle",
+    Run_Function = "dragonsurvival:run_function",
+    Area_Cloud = "dragonsurvival:area_cloud"
+}
+
+dispatch dragonsurvival:projectile_block_effect[dragonsurvival:particle] to struct ProjectileBlockParticle {
+    particle_data: ProjectileSpawnParticles,
+    particle_count: LevelBasedValue
+}
+
+dispatch dragonsurvival:projectile_block_effect[dragonsurvival:run_function] to struct ProjectileBlockFunction {
+    function: #[id="function"] string
+}
+
+dispatch dragonsurvival:projectile_block_effect[dragonsurvival:area_cloud] to struct ProjectileAreaCloud {
+    potion: ProjectilePotionData,
+    duration: LevelBasedValue,
+    probability: LevelBasedValue,
+    delay?: LevelBasedValue,
+    radius?: LevelBasedValue,
+    particle: Particle
+}
+
+struct ProjectileEntityEffect {
+    entity_effect: #[id="dragonsurvival:projectile_entity_effect"] ProjectileEntityEffectType,
+    ...dragonsurvival:projectile_entity_effect[[entity_effect]]
+}
+
+enum(string) ProjectileEntityEffectType {
+    Damage = "dragonsurvival:damage",
+    Potion = "dragonsurvival:potion",
+    Lightning = "dragonsurvival:lightning",
+    Particle = "dragonsurvival:particle",
+    Run_Function = "dragonsurvival:run_function",
+    Push = "dragonsurvival:push"
+}
+
+dispatch dragonsurvival:projectile_entity_effect[dragonsurvival:damage] to struct ProjectileDamage {
+    damage_type: #[id="damage_type"] string,
+    amount: LevelBasedValue
+}
+
+dispatch dragonsurvival:projectile_entity_effect[dragonsurvival:potion] to struct ProjectilePotion {
+    potion: ProjectilePotionData
+}
+
+dispatch dragonsurvival:projectile_entity_effect[dragonsurvival:lightning] to struct ProjectileEntityLightning {
+    data: ProjectileLightningData
+}
+
+dispatch dragonsurvival:projectile_entity_effect[dragonsurvival:particle] to struct ProjectileEntityParticle {
+    particle_data: ProjectileSpawnParticles,
+    particle_count: LevelBasedValue
+}
+
+dispatch dragonsurvival:projectile_entity_effect[dragonsurvival:run_function] to struct ProjectileEntityFunction {
+    function: #[id="function"] string
+}
+
+dispatch dragonsurvival:projectile_entity_effect[dragonsurvival:push] to struct ProjectilePush {
+    target_direction: ProjectileTargetDirection,
+    push_force: LevelBasedValue
+}
+
+struct ProjectileWorldEffect {
+    world_effect: #[id="dragonsurvival:projectile_world_effect"] ProjectileWorldEffectType,
+    ...dragonsurvival:projectile_world_effect[[world_effect]]
+}
+
+enum(string) ProjectileWorldEffectType {
+    Explosion = "dragonsurvival:explosion",
+    Lightning = "dragonsurvival:lightning",
+    Particle = "dragonsurvival:particle",
+    Run_Function = "dragonsurvival:run_function"
+}
+
+dispatch dragonsurvival:projectile_world_effect[dragonsurvival:explosion] to struct ProjectileExplosion {
+    damage_type: #[id="damage_type"] string,
+    explosion_power: LevelBasedValue,
+    fire: boolean,
+    break_blocks: boolean,
+    can_damage_self: boolean
+}
+
+dispatch dragonsurvival:projectile_world_effect[dragonsurvival:lightning] to struct ProjectileWorldLightning {
+    data: ProjectileLightningData
+}
+
+dispatch dragonsurvival:projectile_world_effect[dragonsurvival:particle] to struct ProjectileWorldParticle {
+    particle_data: ProjectileSpawnParticles,
+    particle_count: LevelBasedValue
+}
+
+dispatch dragonsurvival:projectile_world_effect[dragonsurvival:run_function] to struct ProjectileWorldFunction {
+    function: #[id="function"] string
+}
+
+struct ProjectilePotionData {
+    effects: (
+        #[id(registry="mob_effect", tags="allowed")] string |
+        [#[id="mob_effect"] string] |
+    ),
+    amplifier: LevelBasedValue,
+    duration: LevelBasedValue,
+    probability: LevelBasedValue,
+    effect_particles: boolean,
+    show_icon: boolean
+}
+
+struct ProjectileSpawnParticles {
+    particle: Particle,
+    horizontal_position: ProjectileParticlePosition,
+    vertical_position: ProjectileParticlePosition,
+    horizontal_velocity: ProjectileParticleVelocity,
+    vertical_velocity: ProjectileParticleVelocity,
+    speed?: any
+}
+
+struct ProjectileParticlePosition {
+    type: ProjectileParticlePositionType,
+    offset?: float,
+    scale?: float @ 0..
+}
+
+enum(string) ProjectileParticlePositionType {
+    Entity_Position = "entity_position",
+    In_Bounding_Box = "in_bounding_box"
+}
+
+struct ProjectileParticleVelocity {
+    movement_scale?: float,
+    base?: any
+}
+
+struct ProjectileLightningData {
+    ignores_items_and_experience: boolean,
+    spawns_fire: boolean,
+    can_hurt_self: boolean
+}
+
+struct ProjectileTargetDirection {
+    direction: (ProjectileCustomDirection | Direction)
+}
+
+struct ProjectileCustomDirection {
+    type: ProjectileCustomDirectionType,
+    target?: EntityPredicate
+}
+
+enum(string) ProjectileCustomDirectionType {
+    Towards_Entity = "towards_entity",
+    Looking_At = "looking_at"
+}

@@ -89,7 +89,7 @@ function Tools() {
 		<ToolCard title="Report Inspector" icon="report"
 			link="https://misode.github.io/report/"
 			desc="Analyse your performance reports" />
-		<ToolCard title="Minecraft Sounds" icon="sounds"
+		<ToolCard title="Minecraft Sounds" icon="sound_explorer"
 			link="/sounds/"
 			desc="Browse through and mix all the vanilla sounds" />
 		<ToolCard title="Transformation preview"

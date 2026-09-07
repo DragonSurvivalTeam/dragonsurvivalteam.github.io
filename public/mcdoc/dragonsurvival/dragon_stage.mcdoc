@@ -8,7 +8,7 @@ dispatch minecraft:resource[dragonsurvival:dragon_stage] to struct DragonStage {
     /// Min. and max. growth of the stage
     growth_range: Bounds,
     /// Amount of ticks until max. growth is reached (can be specified between 1 tick and 1 year) (20 ticks = 1 second)
-    ticks_until_grown: int @ 20..630720000,
+    ticks_until_grown: int @ 1..630720000,
     /// Attribute modifiers which scale based on the dragon growth (within bounds)
     /// (Within bounds means if the stage bounds are between 10 and 15 and the current growth is 12, the "level" will be 2)
     modifiers?: [Modifier],

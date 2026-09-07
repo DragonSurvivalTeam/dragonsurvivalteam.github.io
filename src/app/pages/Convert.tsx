@@ -8,7 +8,7 @@ import { useTitle } from '../contexts/Title.jsx'
 import { useActiveTimeout } from '../hooks/useActiveTimout.js'
 import { useLocalStorage } from '../hooks/useLocalStorage.js'
 import type { VersionId } from '../services/Versions.js'
-import { checkVersion } from '../services/Versions.js'
+import { checkVersion, VersionIds } from '../services/Versions.js'
 import { jsonToNbt } from '../Utils.js'
 
 // When adding new formats, also update the list in vite.config.js !!!
@@ -37,6 +37,7 @@ export function Convert({ formats }: Props) {
 
 	const supportedVersions = useMemo(() => {
 		return config.versions
+			.filter(v => VersionIds.includes(v.id as VersionId))
 			.filter(v => checkVersion(v.id, '1.20.5'))
 			.map(v => v.id as VersionId)
 			.reverse()

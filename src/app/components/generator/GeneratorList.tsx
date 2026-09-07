@@ -2,14 +2,15 @@ import { useMemo, useState } from 'preact/hooks'
 import type { ConfigGenerator } from '../../Config.js'
 import config from '../../Config.js'
 import { useLocale, useVersion } from '../../contexts/index.js'
-import { checkVersion } from '../../services/Versions.js'
+import { generatorSupportsVersion } from '../../Utils.js'
 import { GeneratorCard, TextInput, VersionSwitcher } from '../index.js'
 
 interface Props {
 	path?: string,
 	predicate?: (gen: ConfigGenerator) => boolean | undefined,
+	compare?: (first: ConfigGenerator, second: ConfigGenerator) => number,
 }
-export function GeneratorList({ predicate }: Props) {
+export function GeneratorList({ predicate , compare }: Props) {
 	const { locale } = useLocale()
 	const { version, changeVersion } = useVersion()
 
@@ -21,14 +22,14 @@ export function GeneratorList({ predicate }: Props) {
 		return config.generators.filter(gen => {
 			if (predicate === undefined || !predicate(gen)) return false
 			if (versionFilter === false) return true
-			return checkVersion(version, gen.minVersion, gen.maxVersion)
+			return generatorSupportsVersion(gen, version)
 		})
 	}, [version, versionFilter])
 
 	const filteredGenerators = useMemo(() => {
 		const results = versionedGenerators
 			.map(g => ({ ...g, name: locale(`generator.${g.id}`).toLowerCase() }))
-		return searchGenerators(results, search)
+		return searchGenerators(results, search, compare)
 	}, [versionedGenerators, search, locale])
 
 	return <div class="generator-list">
@@ -46,7 +47,7 @@ export function GeneratorList({ predicate }: Props) {
 	</div>
 }
 
-export function searchGenerators(generators: (ConfigGenerator & { name: string})[], search?: string) {
+export function searchGenerators(generators: (ConfigGenerator & { name: string})[], search?: string, compare?: (first: ConfigGenerator, second: ConfigGenerator) => number) {
 	if (search) {
 		const parts = search.split(' ').map(q => q.trim().toLowerCase()).filter(q => q.length > 0)
 		generators = generators.filter(g => parts.some(p => g.name.includes(p))
@@ -54,7 +55,10 @@ export function searchGenerators(generators: (ConfigGenerator & { name: string})
 			|| parts.some(p => g.tags?.some(t => t.includes(p)) ?? false)
 			|| parts.some(p => g.aliases?.some(a => a.includes(p)) ?? false))
 	}
-	generators.sort((a, b) => a.name.localeCompare(b.name))
+	generators.sort((a, b) => {
+		const compared = compare ? compare(a, b) : 0
+		return compared == 0 ? a.name.localeCompare(b.name) : compared
+	})
 	if (search) {
 		generators.sort((a, b) => (b.name.startsWith(search) ? 1 : 0) - (a.name.startsWith(search) ? 1 : 0))
 	}

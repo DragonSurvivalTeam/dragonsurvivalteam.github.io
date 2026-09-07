@@ -40,7 +40,7 @@ dispatch minecraft:resource[dragonsurvival:dragon_body] to struct DragonBody {
     /// Specifies the unlock condition for this body and its visibility in the dragon editor
     unlockable_behavior?: UnlockableBehavior,
     /// Attribute modifiers which are always calculated with a "level" of 1
-    modifiers?: [Modifier],
+    modifiers: [Modifier],
     /// Determines whether the wings can be hidden (default: true)
     can_hide_wings?: boolean,
     /// The model this body uses (default: dragonsurvival:dragon_model)
@@ -51,62 +51,25 @@ dispatch minecraft:resource[dragonsurvival:dragon_body] to struct DragonBody {
     texture_size?: TextureSize,
     /// The animations this body uses
     /// The prefix 'animations/' and suffix '.json' will be appended to the path find the animation file
-    animation: #[id] string,
+    animation?: #[id] string,
     /// Default GUI icon which is used if the current species has no specific icon
     default_icon?: #[id] string,
     /// List of bones that will be hidden when the wings are hidden
     /// (default: 'WingLeft', 'WingRight', 'SmallWingLeft' and 'SmallWingRight')
     bones_to_hide_for_toggle?: [string],
     /// Which emotes this body can use
-    emotes: [DragonEmoteSet],
+    emotes?: #[id="dragonsurvival:dragon_emote_set"] string,
     /// How the height and width dimensions are calculated (using the current scale of the entity)
-    scaling_proportions: ScalingProportions,
+    scaling_proportions?: ScalingProportions,
     /// Determines how much the height changes when crouching
-    crouch_height_ratio: double @ 0..1,
-    /// Determines where to place the rider
-    mounting_offset?: MountingOffsets,
+    crouch_height_ratio?: double @ 0..1,
     /// Determines where to place the backpack (the base position is the bone 'BackpackBone')
     backpack_offset?: BackpackOffsets,
     /// To offset the height to display Better Combat weapons correctly
     /// (Default is 0)
-    bettercombat_weapon_offset?: double
-}
-
-struct DragonEmoteSet {
-    emotes: [DragonEmote]
-}
-
-struct DragonEmote {
-    animation_key: string,
-    translation_override?: string,
-    /// Animation speed (default: 1)
-    speed?: double,
-    /// Animation duration (default: infinite)
-    duration?: int @ 1..,
-    /// Whether the animation can loop or not (default: false)
-    loops?: boolean,
-    /// (default: false)
-    blend?: boolean,
-    /// (default: false)
-    locks_head?: boolean,
-    /// (default: false)
-    locks_tail?: boolean,
-    /// (default: false)
-    third_person?: boolean,
-    /// (default: false)
-    can_move?: boolean,
-    /// Sound to be played during the emote
-    sound?: Sound,
-}
-
-struct Sound {
-    sound_event: #[id="sound_event"] string,
-    /// Volume of the sound (default: 1)
-    volume?: float @ 0..,
-    /// Pitch of the sound (default: 1)
-    pitch?: float @ 0..,
-    /// Determines how often the sound is played (calculated as emote_ticks % interval == 0)
-    interval: int
+    bettercombat_weapon_offset?: double,
+    /// Whether players can ride this dragon body (default: true)
+    rideable?: boolean
 }
 
 struct ScalingProportions {
@@ -116,16 +79,9 @@ struct ScalingProportions {
     /// Default: 1
     scale_multiplier?: double @ 0..,
     /// Default: 1
-    shadow_multiplier?: double @ 0..
-}
-
-struct MountingOffsets {
-    /// (default: [0, 0, 0])
-    human_offset: [float] @ 3,
-    /// (default: [0, 0, 0])
-    dragon_offset: [float] @ 3,
-    /// (default: [0, 0, 0])
-    offset_per_scale_above_one: [float] @ 3,
+    shadow_multiplier?: double @ 0..,
+    /// Offset used while climbing ceilings (default: 1)
+    ceiling_climbing_offset_multiplier?: double @ -10..10
 }
 
 struct BackpackOffsets {
